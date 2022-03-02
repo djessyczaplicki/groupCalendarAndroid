@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Calendario de Grupo</string>
+    <string name="timetable_screen">Horario</string>
+    <string name="monday">Lunes</string>
+    <string name="tuesday">Martes</string>
+    <string name="wednesday">Miércoles</string>
+    <string name="thursday">Jueves</string>
+    <string name="friday">Viernes</string>
+    <string name="saturday">Sábado</string>
+    <string name="sunday">Domingo</string>
+    <string name="monday_short">Lun.</string>
+    <string name="tuesday_short">Mar.</string>
+    <string name="wednesday_short">Mie.</string>
+    <string name="thursday_short">Jue.</string>
+    <string name="friday_short">Vie.</string>
+    <string name="saturday_short">Sáb.</string>
+    <string name="sunday_short">Dom.</string>
+</resources>
