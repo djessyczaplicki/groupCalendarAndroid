@@ -1,5 +1,7 @@
 package com.djessyczaplicki.groupcalendar.data.remote.model
 
+import androidx.compose.ui.graphics.Color
+import java.time.LocalDateTime
 import java.util.*
 
 data class Event(
@@ -7,9 +9,9 @@ data class Event(
     var recurrentId: String? = null,
     var name: String = "default",
     var description: String? = null,
-    var date: Long = Date().time,
-    var duration: Int = 30,
-    var color: String = "#433456",
+    var start: LocalDateTime = LocalDateTime.now(),
+    var end: LocalDateTime = LocalDateTime.now().plusHours(1),
+    var color: Color = Color(0xFFE1BEE7),
     var requireConfirmation: Boolean = false,
     var confirmedUsers: List<String> = emptyList()
 )
