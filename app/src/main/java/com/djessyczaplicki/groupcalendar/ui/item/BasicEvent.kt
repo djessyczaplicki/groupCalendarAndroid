@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import java.time.format.DateTimeFormatter
 
@@ -22,32 +24,41 @@ val EventTimeFormatter = DateTimeFormatter.ofPattern("H:mm")
 fun BasicEvent(
     event: Event,
     modifier: Modifier = Modifier,
+    showDateOnEachEvent: Boolean = false
 ) {
-    Column(
+    Card(
+        elevation = 3.dp,
         modifier = modifier
             .fillMaxSize()
-            .padding(end = 2.dp, bottom = 2.dp)
-            .background(event.color, shape = RoundedCornerShape(4.dp))
-            .padding(4.dp)
-    ) {
-        Text(
-            text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
-            style = MaterialTheme.typography.caption
-        )
+            .padding(1.dp)
+    ){
+        Column(
+            modifier = modifier
+                .background(event.color, shape = RoundedCornerShape(4.dp))
+        ) {
+            val fontSize = 10.sp
+            if (showDateOnEachEvent)
+                Text(
+                    text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
+                    fontSize = fontSize,
+                    style = MaterialTheme.typography.caption
+                )
 
-        Text(
-            text = event.name,
-            style = MaterialTheme.typography.body1,
-            fontWeight = FontWeight.Bold
-        )
-
-        if (event.description != null) {
             Text(
-                text = event.description!!,
-                style = MaterialTheme.typography.body2,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = event.name,
+                fontSize = fontSize,
+                style = MaterialTheme.typography.body1,
+                fontWeight = FontWeight.Bold
             )
+
+            if (event.description != null) {
+                Text(
+                    text = event.description!!,
+                    fontSize = fontSize,
+                    style = MaterialTheme.typography.body2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }

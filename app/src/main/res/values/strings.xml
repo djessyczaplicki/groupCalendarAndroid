@@ -15,4 +15,15 @@
     <string name="friday_short">Fri.</string>
     <string name="saturday_short">Sat.</string>
     <string name="sunday_short">Sun.</string>
+    <string name="username">Username</string>
+    <string name="wrong_credentials">Wrong credentials</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="add_event_screen">Add event</string>
+    <string name="title">Title</string>
+    <string name="event_title">Event title</string>
+    <string name="description">Description</string>
+    <string name="event_description">Write a description for this event…</string>
+    <string name="color">Color</string>
+    <string name="create_event">Create event</string>
 </resources>

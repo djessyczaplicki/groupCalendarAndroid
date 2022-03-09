@@ -25,7 +25,7 @@ object RetrofitHelper {
     fun setToken(token: String) {
         mtoken = token
         Log.i("RetrofitHelper", "This is my new token: $mtoken")
-        val interceptor = AuthenticationInterceptor("Bearer $mtoken")
+        val interceptor = AuthenticationInterceptor(mtoken)
         if (!httpClient.interceptors().contains(interceptor)) {
             httpClient.addInterceptor(interceptor)
             builder.client(httpClient.build())

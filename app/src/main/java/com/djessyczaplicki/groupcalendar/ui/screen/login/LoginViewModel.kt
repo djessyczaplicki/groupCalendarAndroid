@@ -10,49 +10,62 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
+import com.djessyczaplicki.groupcalendar.util.UserPreferences
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
+    private val TAG = "LoginViewModel"
     private val isLoading = mutableStateOf(false)
     private val loadError = mutableStateOf("")
+    private lateinit var auth: FirebaseAuth
 
     fun isLoading(): MutableState<Boolean> = isLoading
     fun loadError() : MutableState<String> = loadError
 
 
 
-    fun login(username: String, password: String, context: Context, onSuccessCallback: () -> Unit){
+    fun login(email: String, password: String, context: Context, onSuccessCallback: () -> Unit, onFailureCallback: (exception: String?) -> Unit){
         viewModelScope.launch {
             isLoading.value = true
-            try {
-                val token = loginUseCase(username, password)
-                if (token.isNotEmpty()){
-                    isLoading.value = false
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "signInWithEmail:success")
+                        val user = auth.currentUser
+                        val token = auth.getAccessToken(false).result?.token
+                        viewModelScope.launch {
+                            UserPreferences(context).saveAuthToken(token?:"")
+                            RetrofitHelper.setToken(token?:"")
+                            onSuccessCallback()
+                        }
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.exception)
+                        onFailureCallback(task.exception?.message)
+                    }
                 }
-                Logger.i(token)
-                val userPreferences = UserPreferences(context)
-                userPreferences.saveAuthToken(token)
-                onSuccessCallback()
+        }
+    }
 
-            } catch (e: WrongCredentialsException) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.wrong_credentials_exception_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-                isLoading.value = false
-
-            } catch (e: Exception) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.connection_error_exception_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-                Logger.e(e.message ?: e.toString())
-                isLoading.value = false
-
+    fun testAuth(context: Context, onSuccessCallback: () -> Unit) {
+        auth = Firebase.auth
+        auth.currentUser.toString()
+        if (auth.currentUser != null) {
+            auth.getAccessToken(false).addOnCompleteListener {
+                viewModelScope.launch {
+                    val token = it.result?.token
+                    UserPreferences(context).saveAuthToken(token ?: "")
+                    RetrofitHelper.setToken(token ?: "")
+                    onSuccessCallback()
+                }
             }
         }
     }

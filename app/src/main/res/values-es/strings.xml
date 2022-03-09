@@ -16,4 +16,15 @@
     <string name="friday_short">Vie.</string>
     <string name="saturday_short">Sáb.</string>
     <string name="sunday_short">Dom.</string>
+    <string name="username">Nombre de usuario:</string>
+    <string name="wrong_credentials">Combinación usuario contraseña erronea</string>
+    <string name="login">Conectarse</string>
+    <string name="password">Contraseña</string>
+    <string name="add_event_screen">Añadir evento</string>
+    <string name="title">Título</string>
+    <string name="event_title">Título del evento</string>
+    <string name="description">Descripción</string>
+    <string name="event_description">Escribe una descripción para este evento…</string>
+    <string name="color">Color</string>
+    <string name="create_event">Crear evento</string>
 </resources>

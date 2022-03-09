@@ -34,6 +34,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -42,9 +44,10 @@ fun LoginScreen (
     loginViewModel: LoginViewModel
 ) {
     val context = LocalContext.current
+    val auth = Firebase.auth
     LaunchedEffect("login_test") {
-        loginViewModel.testToken(context) {
-            navController.navigate(AppScreens.TableListScreen.route){
+        loginViewModel.testAuth(context){
+            navController.navigate(AppScreens.TimetableScreen.route){
                 popUpTo(0)
             }
         }
@@ -74,7 +77,7 @@ fun LoginScreen (
                     .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo),
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
@@ -116,7 +119,7 @@ fun LoginScreen (
                     IconButton(onClick = {
                         passwordVisibility = !passwordVisibility
                     }) {
-                        Icon(imageVector  = image, "")
+                        Icon(imageVector = image, "")
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(
@@ -129,11 +132,19 @@ fun LoginScreen (
                     .height(50.dp)
                     .width(200.dp),
                 onClick = {
-                    loginViewModel.login(username, password, context) {
-                        navController.navigate(AppScreens.TableListScreen.route){
-                            popUpTo(0)
+                    loginViewModel.login(
+                        username,
+                        password,
+                        context,
+                        onSuccessCallback = {
+                            navController.navigate(AppScreens.TimetableScreen.route){
+                                popUpTo(0)
+                            }
+                        },
+                        onFailureCallback = {
+                            Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
                         }
-                    }
+                    )
                 }
             ) {
                 Text(text = stringResource(id = R.string.login))
@@ -148,7 +159,7 @@ fun LoginScreen (
 @Preview(showBackground = true)
 @Composable
 fun PreviewLoginScreen() {
-    DeliiciousWaitressTheme {
+    MaterialTheme {
         LoginScreen(
             navController = rememberNavController(),
             loginViewModel = LoginViewModel()
