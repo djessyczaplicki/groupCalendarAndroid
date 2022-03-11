@@ -26,4 +26,11 @@
     <string name="event_description">Write a description for this event…</string>
     <string name="color">Color</string>
     <string name="create_event">Create event</string>
+    <string name="pick_a_date">Pick a date</string>
+    <string name="selected_date">Selected date:</string>
+    <string name="start_time">Starts at</string>
+    <string name="end_time">Ends at</string>
+    <string name="is_recurrent">Is recurrent?</string>
+    <string name="select_week_day">Select a week day:</string>
+    <string name="require_confirmation">Requires confirmation of the participants ?</string>
 </resources>

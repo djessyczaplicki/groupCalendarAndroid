@@ -45,6 +45,7 @@ fun BasicEvent(
                 )
 
             Text(
+                modifier = Modifier.padding(2.dp),
                 text = event.name,
                 fontSize = fontSize,
                 style = MaterialTheme.typography.body1,
@@ -53,6 +54,7 @@ fun BasicEvent(
 
             if (event.description != null) {
                 Text(
+                    modifier = Modifier.padding(1.dp),
                     text = event.description!!,
                     fontSize = fontSize,
                     style = MaterialTheme.typography.body2,

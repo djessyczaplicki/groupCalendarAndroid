@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Event(
-    var id: String = "0",
-    var recurrentId: String? = null,
+    var id: String = UUID.randomUUID().toString(),
+    var recurrenceId: String? = null,
     var name: String = "default",
     var description: String? = null,
     var start: LocalDateTime = LocalDateTime.now(),

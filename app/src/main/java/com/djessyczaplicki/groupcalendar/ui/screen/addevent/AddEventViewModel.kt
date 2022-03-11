@@ -1,6 +1,7 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.addevent
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
@@ -24,12 +25,21 @@ class AddEventViewModel : ViewModel() {
         }
     }
 
-    fun createEvent(event: Event) {
+    fun createEvent(event: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)
-            event.id = group.value.events.size.toString() /* TODO change this */
             group.value.events += event
             updateGroupEventsUseCase(group.value)
+            onSuccessCallback()
+        }
+    }
+
+    fun createRecurrentEvent(newEvents: MutableList<Event>, onSuccessCallback: () -> Unit) {
+        viewModelScope.launch {
+            group.value = getGroupByIdUseCase(groupId)
+            group.value.events += newEvents
+            updateGroupEventsUseCase(group.value)
+            onSuccessCallback()
         }
     }
 }

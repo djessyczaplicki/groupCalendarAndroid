@@ -27,6 +27,7 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
+import java.lang.Integer.max
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -139,7 +140,7 @@ fun BasicSchedule(
     hourHeight: Dp
 ) {
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt()
-    val dividerColor = if (isSystemInDarkTheme()) Color.LightGray else Color.DarkGray
+    val dividerColor = Color.LightGray
     Layout(
         content = {
             events.sortedBy(Event::start).forEach { event ->
@@ -181,7 +182,10 @@ fun BasicSchedule(
         val placeablesWithEvents = measurables.map { measurable ->
             val event = measurable.parentData as Event
             val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
-            val eventHeight = ((eventDurationMinutes.div(60f)) * hourHeight.toPx()).roundToInt()
+            val eventHeight = max(
+                ((eventDurationMinutes.div(60f)) * hourHeight.toPx()).roundToInt(),
+                50
+            )
             val placeable = measurable.measure(
                 constraints.copy(
                     minWidth = dayWidth.roundToPx(),
