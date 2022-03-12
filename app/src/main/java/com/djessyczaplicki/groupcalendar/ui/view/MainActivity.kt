@@ -1,25 +1,16 @@
 package com.djessyczaplicki.groupcalendar.ui.view
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
-import com.djessyczaplicki.groupcalendar.ui.screen.addevent.AddEventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
-import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 
@@ -27,17 +18,38 @@ class MainActivity : ComponentActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels()
     private val timetableViewModel: TimetableViewModel by viewModels()
-    private val addEventViewModel: AddEventViewModel by viewModels()
+    private val eventViewModel: EventViewModel by viewModels()
+    private val editEventViewModel: EditEventViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.addLogAdapter(AndroidLogAdapter())
+        handleIntent(intent)
+
         setContent {
             MainScreen(
                 loginViewModel,
                 timetableViewModel,
-                addEventViewModel
+                eventViewModel,
+                editEventViewModel,
+                intent
             )
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val appLinkAction = intent.action
+        val appLinkData: Uri? = intent.data
+        if (Intent.ACTION_VIEW == appLinkAction) {
+            appLinkData?.lastPathSegment?.also { groupId ->
+                intent.putExtra("group_id", groupId)
+                // https://developer.android.com/studio/write/app-link-indexing
+            }
         }
     }
 }

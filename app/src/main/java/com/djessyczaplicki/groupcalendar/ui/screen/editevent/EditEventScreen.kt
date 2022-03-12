@@ -1,4 +1,4 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.addevent
+package com.djessyczaplicki.groupcalendar.ui.screen.editevent
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,7 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,30 +21,32 @@ import com.djessyczaplicki.groupcalendar.ui.item.ColorPicker
 import com.djessyczaplicki.groupcalendar.ui.item.DatePickerPopup
 import com.djessyczaplicki.groupcalendar.ui.item.LabelledCheckbox
 import com.djessyczaplicki.groupcalendar.ui.item.TimePickerPopup
+import com.djessyczaplicki.groupcalendar.util.formatted
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.TextStyle
 import java.util.*
 
 @Composable
-fun AddEventScreen(
+fun EditEventScreen(
     navController: NavController,
-    addEventViewModel: AddEventViewModel
+    editEventViewModel: EditEventViewModel
 ) {
-    var title by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
+    val isEditing = editEventViewModel.isEditing.value
+    val event = editEventViewModel.event.value
+    var title by rememberSaveable { mutableStateOf(event.name) }
+    var description by rememberSaveable { mutableStateOf(event.description ?: "") }
     var color by remember { mutableStateOf(0x0UL) }
-    var startDate by rememberSaveable { mutableStateOf(LocalDateTime.now()) }
-    var startHour by rememberSaveable { mutableStateOf(0L)}
-    var startMinute by rememberSaveable { mutableStateOf(0L)}
-    var startTimeIsSet by rememberSaveable { mutableStateOf(false) }
-    var endHour by rememberSaveable { mutableStateOf(0L)}
-    var endMinute by rememberSaveable { mutableStateOf(0L)}
-    var endTimeIsSet by rememberSaveable { mutableStateOf(false) }
-    var isRecurrent by rememberSaveable { mutableStateOf(false) }
+    var startDate by rememberSaveable { mutableStateOf(event.start) }
+    var startHour by rememberSaveable { mutableStateOf(event.start.hour.toLong())}
+    var startMinute by rememberSaveable { mutableStateOf(event.start.minute.toLong())}
+    var startTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
+    var endHour by rememberSaveable { mutableStateOf(event.end.hour.toLong())}
+    var endMinute by rememberSaveable { mutableStateOf(event.end.minute.toLong())}
+    var endTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
+    var isRecurrent by rememberSaveable { mutableStateOf(event.recurrenceId != null) }
     var daysExpanded by rememberSaveable { mutableStateOf(false) }
-    var selectedDay by rememberSaveable { mutableStateOf("") }
+    var selectedDay by rememberSaveable { mutableStateOf(event.start.dayOfWeek.formatted()) }
     var requireConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -53,7 +54,7 @@ fun AddEventScreen(
     ) {
 
         Text(
-            text = stringResource(id = R.string.add_event_screen),
+            text = stringResource(id = if (!isEditing) R.string.add_event_screen else R.string.edit_event),
             modifier = Modifier
                 .height(30.dp)
                 .padding(4.dp),
@@ -66,6 +67,7 @@ fun AddEventScreen(
             placeholder = { Text(stringResource(id = R.string.event_title))},
             modifier = Modifier
                 .fillMaxWidth()
+                .height(70.dp)
                 .padding(4.dp)
         )
         OutlinedTextField(
@@ -122,11 +124,11 @@ fun AddEventScreen(
                     DayOfWeek.values().forEach { day ->
                         DropdownMenuItem(
                             onClick = {
-                                selectedDay = day.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                selectedDay = day.formatted()
                                 daysExpanded = false
                             }
                         ) {
-                            Text(day.getDisplayName(TextStyle.FULL, Locale.getDefault()))
+                            Text(day.formatted())
                         }
                     }
                 }
@@ -194,7 +196,7 @@ fun AddEventScreen(
             label = stringResource(R.string.require_confirmation)
         )
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             modifier = Modifier
@@ -205,7 +207,7 @@ fun AddEventScreen(
                 if (!isRecurrent) {
                     val startDateTime = startDate.plusHours(startHour).plusMinutes(startMinute)
                     val endDateTime = startDate.plusHours(endHour).plusMinutes(endMinute)
-                    addEventViewModel.createEvent(
+                    editEventViewModel.createEvent(
                         Event(
                             name = title,
                             description = description,
@@ -219,7 +221,7 @@ fun AddEventScreen(
                 } else {
                     val recurrentId = UUID.randomUUID().toString()
                     val newEvents = mutableListOf<Event>()
-                    val dayOfWeek = DayOfWeek.values().find{ it.getDisplayName(TextStyle.FULL, Locale.getDefault()) == selectedDay }
+                    val dayOfWeek = DayOfWeek.values().find{ it.formatted() == selectedDay }
                     startDate = LocalDate.now().with(dayOfWeek).atStartOfDay()
                     for (i in 0 until 5) {
                         val startDateTime = startDate.plusWeeks(i.toLong()).plusHours(startHour).plusMinutes(startMinute)
@@ -234,7 +236,7 @@ fun AddEventScreen(
                             requireConfirmation = requireConfirmation
                         ))
                     }
-                    addEventViewModel.createRecurrentEvent(newEvents){
+                    editEventViewModel.createRecurrentEvent(newEvents){
                         navController.popBackStack()
                     }
                 }
@@ -252,8 +254,8 @@ fun AddEventScreen(
 @Preview(showBackground = true)
 @Composable
 fun AddEventScreenPreview() {
-    AddEventScreen(
+    EditEventScreen(
         rememberNavController(),
-        AddEventViewModel()
+        EditEventViewModel()
     )
 }

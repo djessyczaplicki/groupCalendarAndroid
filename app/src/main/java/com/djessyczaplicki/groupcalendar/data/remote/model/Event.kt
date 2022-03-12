@@ -7,7 +7,7 @@ import java.util.*
 data class Event(
     var id: String = UUID.randomUUID().toString(),
     var recurrenceId: String? = null,
-    var name: String = "default",
+    var name: String = "",
     var description: String? = null,
     var start: LocalDateTime = LocalDateTime.now(),
     var end: LocalDateTime = LocalDateTime.now().plusHours(1),

@@ -33,4 +33,9 @@
     <string name="is_recurrent">Is recurrent?</string>
     <string name="select_week_day">Select a week day:</string>
     <string name="require_confirmation">Requires confirmation of the participants ?</string>
+    <string name="edit_event">Edit event</string>
+    <string name="edit_event_screen">Edit event</string>
+    <string name="this_is_a_recurrent_event">This is a recurrent event</string>
+    <string name="day">Day</string>
+    <string name="event_screen">Event</string>
 </resources>

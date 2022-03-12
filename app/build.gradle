@@ -68,7 +68,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     implementation 'androidx.test.espresso:espresso-core:3.4.0@aar'
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta02"
-
+    implementation "com.google.accompanist:accompanist-pager:0.24.3-alpha"
 
     // retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,17 +21,20 @@ import java.time.format.DateTimeFormatter
 
 val EventTimeFormatter = DateTimeFormatter.ofPattern("H:mm")
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BasicEvent(
     event: Event,
     modifier: Modifier = Modifier,
-    showDateOnEachEvent: Boolean = false
+    showDateOnEachEvent: Boolean = false,
+    action: () -> Unit = {}
 ) {
     Card(
         elevation = 3.dp,
         modifier = modifier
             .fillMaxSize()
-            .padding(1.dp)
+            .padding(1.dp),
+        onClick = action
     ){
         Column(
             modifier = modifier

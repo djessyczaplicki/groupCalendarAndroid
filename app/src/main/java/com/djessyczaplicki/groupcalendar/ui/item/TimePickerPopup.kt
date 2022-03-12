@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.util.formatMinute
 import java.lang.Integer.max
 import java.util.*
 
@@ -54,7 +55,4 @@ fun TimePickerPopup(
 
 }
 
-private fun Int.formatMinute(): String {
-    if (this > 9) return this.toString()
-    return "0$this"
-}
+

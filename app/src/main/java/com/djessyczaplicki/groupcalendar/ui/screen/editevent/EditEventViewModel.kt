@@ -1,27 +1,29 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.addevent
+package com.djessyczaplicki.groupcalendar.ui.screen.editevent
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.domain.eventusecase.UpdateGroupEventsUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
-import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupsUseCase
 import kotlinx.coroutines.launch
 
-class AddEventViewModel : ViewModel() {
+class EditEventViewModel : ViewModel() {
     lateinit var groupId: String
 
     val updateGroupEventsUseCase = UpdateGroupEventsUseCase()
     val getGroupByIdUseCase = GetGroupByIdUseCase()
 
     val group = mutableStateOf(Group())
+    val event = mutableStateOf(Event())
+    val isEditing = mutableStateOf(false)
 
-    fun loadGroup() {
+    fun loadEvent(groupId: String, eventId: String) {
+        this.groupId = groupId
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)
+            event.value = group.value.events.find{ it.id == eventId } ?: Event()
         }
     }
 
@@ -42,4 +44,6 @@ class AddEventViewModel : ViewModel() {
             onSuccessCallback()
         }
     }
+
+
 }

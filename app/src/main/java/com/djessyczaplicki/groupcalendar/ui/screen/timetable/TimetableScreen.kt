@@ -1,11 +1,13 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import android.content.Intent
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,6 +29,11 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.orhanobut.logger.Logger
+import kotlinx.coroutines.launch
 import java.lang.Integer.max
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -35,66 +42,88 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TimetableScreen(
     navController: NavController,
     timetableViewModel: TimetableViewModel
 ) {
-    val groups = timetableViewModel.groups.value
-    var group: Group? = null
-    var weeksToAdd by rememberSaveable { mutableStateOf(0) }
-    val today = LocalDate.now().plusWeeks(weeksToAdd.toLong())
-    // https://stackoverflow.com/questions/28450720/get-date-of-first-day-of-week-based-on-localdate-now-in-java-8
-    val dayOfWeek = DayOfWeek.MONDAY
-    val firstDateOfWeek by rememberSaveable {
-        mutableStateOf(today.with(dayOfWeek))
-    }
-    val lastDateOfWeek = firstDateOfWeek.plusDays(7)
-    var eventsOfTheWeek: List<Event>? = null
-    if (groups.isNotEmpty()) {
-        group = groups.find { it.id == "0" }
-        eventsOfTheWeek = group!!.events.filter { event ->
-            event.start.isAfter(firstDateOfWeek.atStartOfDay())
-            event.start.isBefore(lastDateOfWeek.atStartOfDay())
-        }
-    }
-    Column(
-        Modifier
-    ) {
-        if (group != null) {
-            Button(onClick = {
-                navController.navigate(AppScreens.AddEventScreen.route + "/${group.id}")
-            }) {
-                Text("create event")
-            }
-            Button(onClick = { timetableViewModel.removeEvent(group.events[2], group) }) {
-                Text("remove event")
-            }
-            Schedule(
-                events = eventsOfTheWeek!!,
-                minDate = firstDateOfWeek,
-                maxDate = lastDateOfWeek
-            )
-        }
+    Scaffold(
+        topBar = {
 
-    }
+        },
+        content = {
+            var page by rememberSaveable{ mutableStateOf(100) }
+            val pagerState = rememberPagerState()
+            val scrollState = rememberScrollState()
+            val heightPx = with(LocalDensity.current) { 64.dp.roundToPx()}
+            LaunchedEffect(Unit) { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
+
+            HorizontalPager(count = 200, state = pagerState ) { pageNum ->
+                TimetablePage(navController = navController, timetableViewModel = timetableViewModel, weeksToAdd = pageNum - 100, scrollState = scrollState)
+                page = pagerState.currentPage
+            }
+            LaunchedEffect("key1") {
+                pagerState.scrollToPage(if (page == 0) 100 else page)
+            }
+        },
+        floatingActionButton =  {
+            TimetableFAB(navController = navController, timetableViewModel = timetableViewModel)
+        }
+    )
 
 }
 
 @Composable
+fun TimetablePage(
+    navController: NavController,
+    timetableViewModel: TimetableViewModel,
+    weeksToAdd: Int,
+    scrollState: ScrollState
+) {
+    val group = timetableViewModel.group.value
+    val day = LocalDate.now().plusWeeks(weeksToAdd.toLong())
+    // https://stackoverflow.com/questions/28450720/get-date-of-first-day-of-week-based-on-localdate-now-in-java-8
+    val dayOfWeek = DayOfWeek.MONDAY
+    val firstDateOfWeek by rememberSaveable {
+        mutableStateOf(day.with(dayOfWeek))
+    }
+    val lastDateOfWeek = firstDateOfWeek.plusDays(7)
+    var eventsOfTheWeek: List<Event>? = null
+    eventsOfTheWeek = group.events.filter { event ->
+        event.start.isAfter(firstDateOfWeek.atStartOfDay())
+        event.start.isBefore(lastDateOfWeek.atStartOfDay())
+    }
+    Column(
+        Modifier
+    ) {
+        Schedule(
+            events = eventsOfTheWeek,
+            minDate = firstDateOfWeek,
+            maxDate = lastDateOfWeek,
+            eventContent = { event ->
+                BasicEvent(event = event) {
+                    navController.navigate(AppScreens.EventScreen.route + "/${group.id}/${event.id}")
+                }
+            },
+            scrollState = scrollState
+        )
+
+    }
+}
+
+@Composable
 fun Schedule(
-    events: List<Event>,
+    events: List<Event>?,
     modifier: Modifier = Modifier,
     eventContent: @Composable (event: Event) -> Unit = { BasicEvent(event = it) },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
-    minDate: LocalDate = events.minByOrNull(Event::start)!!.start.toLocalDate(),
-    maxDate: LocalDate = events.maxByOrNull(Event::end)!!.end.toLocalDate()
+    minDate: LocalDate,
+    maxDate: LocalDate,
+    scrollState: ScrollState
 ) {
     val days = ChronoUnit.DAYS.between(minDate, maxDate).toInt()
     val hourHeight = 64.dp
-    val verticalScrollState = rememberScrollState()
-    val heightPx = with(LocalDensity.current) { hourHeight.roundToPx()}
-    LaunchedEffect(Unit) { verticalScrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
     var dayWidth by remember { mutableStateOf(0) }
     var sidebarWidth by remember { mutableStateOf(0) }
     Column(modifier = modifier) {
@@ -112,7 +141,7 @@ fun Schedule(
             ScheduleSidebar(
                 hourHeight = hourHeight,
                 modifier = Modifier
-                    .verticalScroll(verticalScrollState)
+                    .verticalScroll(scrollState)
                     .onGloballyPositioned { sidebarWidth = it.size.width }
             )
             BasicSchedule(
@@ -123,7 +152,7 @@ fun Schedule(
                 dayWidth = with(LocalDensity.current) { dayWidth.toDp() },
                 hourHeight = hourHeight,
                 modifier = Modifier
-                    .verticalScroll(verticalScrollState)
+                    .verticalScroll(scrollState)
             )
         }
     }
@@ -131,11 +160,11 @@ fun Schedule(
 
 @Composable
 fun BasicSchedule(
-    events: List<Event>,
+    events: List<Event>?,
     modifier: Modifier = Modifier,
     eventContent: @Composable (event: Event) -> Unit = { BasicEvent(event = it) },
-    minDate: LocalDate = events.minByOrNull(Event::start)!!.start.toLocalDate(),
-    maxDate: LocalDate = events.maxByOrNull(Event::end)!!.end.toLocalDate(),
+    minDate: LocalDate,
+    maxDate: LocalDate,
     dayWidth: Dp,
     hourHeight: Dp
 ) {
@@ -143,7 +172,7 @@ fun BasicSchedule(
     val dividerColor = Color.LightGray
     Layout(
         content = {
-            events.sortedBy(Event::start).forEach { event ->
+            events?.sortedBy(Event::start)?.forEach { event ->
                 Box(modifier = Modifier.eventData(event)) {
                     eventContent(event)
                 }
@@ -277,4 +306,12 @@ private class EventDataModifier(
     val event: Event
 ) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = event
+}
+
+@Composable
+fun TimetableFAB(navController: NavController, timetableViewModel: TimetableViewModel) {
+    val group = timetableViewModel.group.value
+    FloatingActionButton(onClick = { navController.navigate(AppScreens.EditEventScreen.route + "/${group.id}") }) {
+        Text("+")
+    }
 }

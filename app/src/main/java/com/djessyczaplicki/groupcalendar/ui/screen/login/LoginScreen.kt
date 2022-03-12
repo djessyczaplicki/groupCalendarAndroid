@@ -1,5 +1,6 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.login
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -36,20 +37,34 @@ import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.orhanobut.logger.Logger
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen (
     navController: NavController,
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    intent: Intent
 ) {
     val context = LocalContext.current
     val auth = Firebase.auth
-    LaunchedEffect("login_test") {
-        loginViewModel.testAuth(context){
-            navController.navigate(AppScreens.TimetableScreen.route){
+
+    fun success() {
+        if (!intent.getStringExtra("group_id").isNullOrBlank()){
+            val groupId = intent.getStringExtra("group_id")!!
+            Logger.i(groupId)
+            navController.navigate(AppScreens.TimetableScreen.route + "/$groupId"){
                 popUpTo(0)
             }
+        } else {
+            navController.navigate(AppScreens.TimetableScreen.route + "/0"){
+                popUpTo(0)
+            }
+        }
+    }
+    LaunchedEffect("login_test") {
+        loginViewModel.testAuth(context){
+            success()
         }
     }
 
@@ -137,9 +152,7 @@ fun LoginScreen (
                         password,
                         context,
                         onSuccessCallback = {
-                            navController.navigate(AppScreens.TimetableScreen.route){
-                                popUpTo(0)
-                            }
+                            success()
                         },
                         onFailureCallback = {
                             Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
@@ -154,6 +167,7 @@ fun LoginScreen (
 
 
     }
+
 }
 
 @Preview(showBackground = true)
@@ -162,7 +176,8 @@ fun PreviewLoginScreen() {
     MaterialTheme {
         LoginScreen(
             navController = rememberNavController(),
-            loginViewModel = LoginViewModel()
+            loginViewModel = LoginViewModel(),
+            intent = Intent()
         )
     }
 }
