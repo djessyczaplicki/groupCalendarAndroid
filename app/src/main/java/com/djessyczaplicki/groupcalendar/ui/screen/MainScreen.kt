@@ -2,6 +2,8 @@ package com.djessyczaplicki.groupcalendar.ui.screen
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -60,10 +62,8 @@ fun MainScreen(
                     navArgument("event_id") { type = NavType.StringType }
                 )
             ) {
+                val isLoading = remember { mutableStateOf(false) }
                 editEventViewModel.isEditing.value = true
-                val groupId = it.arguments?.getString("group_id")!!
-                val eventId = it.arguments?.getString("event_id")!!
-                editEventViewModel.loadEvent(groupId, eventId)
                 EditEventScreen(navController, editEventViewModel)
             }
             composable(
@@ -88,6 +88,8 @@ fun MainScreen(
                 val eventId = it.arguments?.getString("event_id")!!
                 eventViewModel.loadEvent(groupId, eventId)
                 EventScreen(navController, eventViewModel)
+                // I preload the editEventView model, so when the user wants to edit it, it's already loaded
+                editEventViewModel.loadEvent(groupId, eventId)
             }
         }
     }
