@@ -9,13 +9,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.data.local.CustomColor
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.ColorPicker
 import com.djessyczaplicki.groupcalendar.ui.item.DatePickerPopup
@@ -36,7 +41,7 @@ fun EditEventScreen(
     val event = editEventViewModel.event.value
     var title by rememberSaveable { mutableStateOf(event.name) }
     var description by rememberSaveable { mutableStateOf(event.description ?: "") }
-    var color by remember { mutableStateOf(0x0UL) }
+    var color by remember { mutableStateOf(event.color.toComposeColor().value) }
     var startDate by rememberSaveable { mutableStateOf(event.start) }
     var startHour by rememberSaveable { mutableStateOf(event.start.hour.toLong())}
     var startMinute by rememberSaveable { mutableStateOf(event.start.minute.toLong())}
@@ -58,7 +63,8 @@ fun EditEventScreen(
             modifier = Modifier
                 .height(30.dp)
                 .padding(4.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
         )
         OutlinedTextField(
             value = title,
@@ -198,6 +204,7 @@ fun EditEventScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        if (startTimeIsSet && endTimeIsSet && title.isNotBlank())
         Button(
             modifier = Modifier
                 .padding(4.dp)
@@ -211,7 +218,7 @@ fun EditEventScreen(
                         Event(
                             name = title,
                             description = description,
-                            color = Color(color),
+                            color = CustomColor.from(color),
                             start = startDateTime,
                             end = endDateTime
                         )
@@ -229,7 +236,7 @@ fun EditEventScreen(
                         newEvents.add(Event(
                             name = title,
                             description = description,
-                            color = Color(color),
+                            color = CustomColor.from(color),
                             start = startDateTime,
                             end = endDateTime,
                             recurrenceId = recurrentId,

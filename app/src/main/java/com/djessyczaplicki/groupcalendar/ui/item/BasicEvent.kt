@@ -38,7 +38,7 @@ fun BasicEvent(
     ){
         Column(
             modifier = modifier
-                .background(event.color, shape = RoundedCornerShape(4.dp))
+                .background(event.color.toComposeColor(), shape = RoundedCornerShape(4.dp))
         ) {
             val fontSize = 10.sp
             if (showDateOnEachEvent)

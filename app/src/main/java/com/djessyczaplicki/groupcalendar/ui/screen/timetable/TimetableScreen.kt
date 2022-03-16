@@ -5,10 +5,9 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -19,14 +18,18 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
+import com.djessyczaplicki.groupcalendar.ui.item.TopBar
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -48,9 +51,20 @@ fun TimetableScreen(
     navController: NavController,
     timetableViewModel: TimetableViewModel
 ) {
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
-
+            TopBar(
+                title = stringResource(id = R.string.timetable_screen) + ": ${timetableViewModel.group.value.name}",
+                navController = navController,
+                onButtonClicked = {
+                    scope.launch {
+                        drawerState.open()
+                    }
+                }
+            )
         },
         content = {
             var page by rememberSaveable{ mutableStateOf(100) }
