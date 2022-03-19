@@ -29,6 +29,7 @@ import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
+import com.djessyczaplicki.groupcalendar.ui.item.DrawerContent
 import com.djessyczaplicki.groupcalendar.ui.item.TopBar
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
@@ -53,38 +54,60 @@ fun TimetableScreen(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-    Scaffold(
-        topBar = {
-            TopBar(
-                title = stringResource(id = R.string.timetable_screen) + ": ${timetableViewModel.group.value.name}",
-                navController = navController,
-                onButtonClicked = {
-                    scope.launch {
-                        drawerState.open()
-                    }
+    val groups = timetableViewModel.groups
+    var gesturesEnabled by remember { mutableStateOf(false) }
+    ModalDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = gesturesEnabled,
+        drawerContent = {
+            DrawerContent(
+                groups = groups.value
+            ) { route ->
+                scope.launch {
+                    gesturesEnabled = false
+                    drawerState.close()
                 }
-            )
-        },
-        content = {
-            var page by rememberSaveable{ mutableStateOf(100) }
-            val pagerState = rememberPagerState()
-            val scrollState = rememberScrollState()
-            val heightPx = with(LocalDensity.current) { 64.dp.roundToPx()}
-            LaunchedEffect(Unit) { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
 
-            HorizontalPager(count = 200, state = pagerState ) { pageNum ->
-                TimetablePage(navController = navController, timetableViewModel = timetableViewModel, weeksToAdd = pageNum - 100, scrollState = scrollState)
-                page = pagerState.currentPage
+                navController.navigate(route) {
+                    popUpTo = navController.graph.startDestinationId
+                    launchSingleTop = true
+                }
             }
-            LaunchedEffect("key1") {
-                pagerState.scrollToPage(if (page == 0) 100 else page)
-            }
-        },
-        floatingActionButton =  {
-            TimetableFAB(navController = navController, timetableViewModel = timetableViewModel)
         }
-    )
+    ) {
+        Scaffold(
+            topBar = {
+                TopBar(
+                    title = stringResource(id = R.string.timetable_screen) + ": ${timetableViewModel.group.value.name}",
+                    navController = navController,
+                    onButtonClicked = {
+                        scope.launch {
+                            gesturesEnabled = true
+                            drawerState.open()
+                        }
+                    }
+                )
+            },
+            content = {
+                var page by rememberSaveable{ mutableStateOf(100) }
+                val pagerState = rememberPagerState()
+                val scrollState = rememberScrollState()
+                val heightPx = with(LocalDensity.current) { 64.dp.roundToPx()}
+                LaunchedEffect(Unit) { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
+
+                HorizontalPager(count = 200, state = pagerState ) { pageNum ->
+                    TimetablePage(navController = navController, timetableViewModel = timetableViewModel, weeksToAdd = pageNum - 100, scrollState = scrollState)
+                    page = pagerState.currentPage
+                }
+                LaunchedEffect("key1") {
+                    pagerState.scrollToPage(if (page == 0) 100 else page)
+                }
+            },
+            floatingActionButton =  {
+                TimetableFAB(navController = navController, timetableViewModel = timetableViewModel)
+            }
+        )
+    }
 
 }
 
@@ -103,10 +126,9 @@ fun TimetablePage(
         mutableStateOf(day.with(dayOfWeek))
     }
     val lastDateOfWeek = firstDateOfWeek.plusDays(7)
-    var eventsOfTheWeek: List<Event>? = null
-    eventsOfTheWeek = group.events.filter { event ->
+    val eventsOfTheWeek = group.events.filter { event ->
         event.start.isAfter(firstDateOfWeek.atStartOfDay())
-        event.start.isBefore(lastDateOfWeek.atStartOfDay())
+        && event.end.isBefore(lastDateOfWeek.plusDays(1L).atStartOfDay())
     }
     Column(
         Modifier
@@ -125,6 +147,9 @@ fun TimetablePage(
 
     }
 }
+
+/* Credits to Daniel Rapmelt */
+/* https://danielrampelt.com/blog/jetpack-compose-custom-schedule-layout-part-1/ */
 
 @Composable
 fun Schedule(

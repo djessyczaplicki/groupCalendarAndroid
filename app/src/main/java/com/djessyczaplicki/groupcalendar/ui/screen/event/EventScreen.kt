@@ -13,8 +13,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Textsms
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,11 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.CollapsingTopBar
-import com.djessyczaplicki.groupcalendar.ui.item.TopBar
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.util.formatMinute
 import com.djessyczaplicki.groupcalendar.util.formatted
-import kotlinx.coroutines.launch
 
 @Composable
 fun EventScreen(
@@ -89,7 +86,7 @@ fun EventScreenContent(
     Column(
         Modifier.verticalScroll(rememberScrollState())
     ) {
-        if (event.description != null) {
+        if (!event.description.isNullOrBlank()) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -123,8 +120,15 @@ fun EventScreenContent(
         ) {
             Icon(Icons.Filled.Event, "Date", Modifier.padding(8.dp))
             Text(
-                text = stringResource(id = R.string.day)
-                        + ": ${event.start.dayOfWeek.formatted()}, ${event.start.dayOfMonth}/${event.start.monthValue}/${event.start.year}",
+                text = buildAnnotatedString {
+                    append(stringResource(id = R.string.day) + ": ")
+                    pushStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    )
+                    append("${event.start.dayOfWeek.formatted()}, ${event.start.dayOfMonth}/${event.start.monthValue}/${event.start.year}")
+                },
                 modifier = Modifier.padding(4.dp)
             )
         }
@@ -161,7 +165,6 @@ fun StartHour(event: Event, modifier: Modifier) {
                 fontWeight = FontWeight.SemiBold
             ))
             append("${event.start.hour}:${event.start.minute.formatMinute()}")
-
         },
         modifier = Modifier
             .padding(4.dp)
@@ -171,8 +174,15 @@ fun StartHour(event: Event, modifier: Modifier) {
 @Composable
 fun EndHour(event: Event, modifier: Modifier) {
     Text(
-        text = stringResource(id = R.string.end_time)
-                + ": ${event.end.hour}:${event.end.minute.formatMinute()}",
+        text = buildAnnotatedString {
+            append(stringResource(id = R.string.end_time) + ": ")
+            pushStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            append("${event.end.hour}:${event.end.minute.formatMinute()}")
+        },
         modifier = modifier
             .padding(4.dp)
     )
@@ -180,13 +190,85 @@ fun EndHour(event: Event, modifier: Modifier) {
 
 @Composable
 fun EventScreenFAB(navController: NavController, eventViewModel: EventViewModel) {
+    var isDeleteAllDialogVisible by remember { mutableStateOf(false) }
+    var isConfirmDialogVisible by remember { mutableStateOf(false) }
     FloatingActionButton(
         onClick = {
-            eventViewModel.delete {
-                navController.popBackStack()
+            if (eventViewModel.event.value.recurrenceId != null) {
+                isDeleteAllDialogVisible = true
+            } else {
+                isConfirmDialogVisible = true
             }
         }
     ) {
         Icon(imageVector = Icons.Filled.Delete, contentDescription = "Delete")
+    }
+
+    if (isConfirmDialogVisible) {
+        AlertDialog(onDismissRequest = { isConfirmDialogVisible = false },
+            title = {
+                Text(stringResource(id = R.string.delete_event))
+            },
+            text = {
+                Text(stringResource(id = R.string.delete_event_text))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isConfirmDialogVisible = false
+                        eventViewModel.delete {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text(stringResource(id = R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        isConfirmDialogVisible = false
+                    }
+                ) {
+                    Text(stringResource(id = R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (isDeleteAllDialogVisible) {
+        AlertDialog(
+            onDismissRequest = { isDeleteAllDialogVisible = false },
+            title = {
+                Text(stringResource(id = R.string.delete_events))
+            },
+            text = {
+                Text(stringResource(id = R.string.delete_events_text))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isDeleteAllDialogVisible = false
+                        eventViewModel.deleteAll {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text(stringResource(id = R.string.delete_all_events))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        isDeleteAllDialogVisible = false
+                        eventViewModel.delete {
+                            navController.popBackStack()
+                        }
+                    }
+                ) {
+                    Text(stringResource(id = R.string.delete_one_event))
+                }
+            }
+        )
     }
 }

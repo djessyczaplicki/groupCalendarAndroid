@@ -39,5 +39,22 @@
     <string name="this_is_a_recurrent_event">Este evento es recurrente</string>
     <string name="day">Día</string>
     <string name="event_screen">Evento</string>
+    <string name="my_groups">Mis grupos:</string>
+    <string name="event_name">Nombre del evento</string>
+    <string name="name">Nombre</string>
+    <string name="recurrence_removal">¿Eliminar recurrencia?</string>
+    <string name="recurrence_removal_text">Si eliminas la recurrencia de este evento, dejará de estar conectado a los demás. Esto implica que los cambios solo se aplicarán a este evento.</string>
+    <string name="proceed">Continuar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="edit_group_screen">Editar grupo</string>
+    <string name="delete_event">¿Eliminar el evento?</string>
+    <string name="delete_events">¿Borrar todas las repeticiones?</string>
+    <string name="delete_all_events">Todas</string>
+    <string name="delete_one_event">Solo esta</string>
+    <string name="delete_event_text">¿Quieres eliminar este evento?</string>
+    <string name="delete_events_text">¿Quieres eliminar todas las repeticiones de este evento recurrente, o solo esta?</string>
+    <string name="delete">Eliminar</string>
+    <string name="group_name">Nombre del grupo</string>
+    <string name="group_description">Descripción del grupo</string>
 
 </resources>

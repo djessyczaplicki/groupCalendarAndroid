@@ -8,6 +8,7 @@ data class Group(
     var events: MutableList<Event> = mutableListOf(),
     var image: String = "",
     var name: String = "default",
+    var description: String? = null,
     var users: List<String> = emptyList(),
     var notifications: List<Notification> = emptyList()
 )

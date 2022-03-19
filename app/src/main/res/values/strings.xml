@@ -38,4 +38,21 @@
     <string name="this_is_a_recurrent_event">This is a recurrent event</string>
     <string name="day">Day</string>
     <string name="event_screen">Event</string>
+    <string name="my_groups">My groups:</string>
+    <string name="event_name">Event name</string>
+    <string name="name">Name</string>
+    <string name="recurrence_removal">Remove recurrence?</string>
+    <string name="recurrence_removal_text">If you remove the recurrence, this event will no longer be linked with the others, implying that the changes will only affect this event.</string>
+    <string name="proceed">Proceed</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit_group_screen">Edit group</string>
+    <string name="delete_event">Remove event ?</string>
+    <string name="delete_events">Remove all events ?</string>
+    <string name="delete_all_events">All events</string>
+    <string name="delete_one_event">Only this one</string>
+    <string name="delete_event_text">Would you like to remove this event ?</string>
+    <string name="delete_events_text">Would you like to remove every instances of this recurrent event, or only this one ?</string>
+    <string name="delete">Delete</string>
+    <string name="group_name">Group Name</string>
+    <string name="group_description">Group description</string>
 </resources>

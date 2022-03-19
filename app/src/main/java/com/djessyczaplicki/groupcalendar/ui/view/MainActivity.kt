@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
     private val timetableViewModel: TimetableViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
     private val editEventViewModel: EditEventViewModel by viewModels()
+    private val editGroupViewModel: EditGroupViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
                 timetableViewModel,
                 eventViewModel,
                 editEventViewModel,
+                editGroupViewModel,
                 intent
             )
         }

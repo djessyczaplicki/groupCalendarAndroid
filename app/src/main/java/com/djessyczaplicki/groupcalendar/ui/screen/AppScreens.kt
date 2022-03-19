@@ -7,4 +7,5 @@ sealed class AppScreens(val route: String, val name: Int) {
     object TimetableScreen: AppScreens("timetable_screen", R.string.timetable_screen)
     object EditEventScreen: AppScreens("edit_event_screen", R.string.edit_event_screen)
     object EventScreen: AppScreens("event_screen", R.string.event_screen)
+    object EditGroupScreen: AppScreens("edit_group_screen", R.string.edit_group_screen)
 }

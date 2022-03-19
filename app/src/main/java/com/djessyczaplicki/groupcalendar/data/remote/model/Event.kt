@@ -15,4 +15,8 @@ data class Event(
     var color: CustomColor = CustomColor(255,255,200),
     var requireConfirmation: Boolean = false,
     var confirmedUsers: List<String> = emptyList()
-)
+) {
+    companion object {
+
+    }
+}

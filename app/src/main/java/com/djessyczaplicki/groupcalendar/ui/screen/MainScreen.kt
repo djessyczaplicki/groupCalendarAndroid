@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventScreen
@@ -20,7 +21,6 @@ import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
-import com.orhanobut.logger.Logger
 
 @Composable
 fun MainScreen(
@@ -28,6 +28,7 @@ fun MainScreen(
     timetableViewModel: TimetableViewModel,
     eventViewModel: EventViewModel,
     editEventViewModel: EditEventViewModel,
+    editGroupViewModel: EditGroupViewModel,
     intent: Intent
 ) {
     val context = LocalContext.current
@@ -53,6 +54,7 @@ fun MainScreen(
             ) {
                 val groupId = it.arguments?.getString("group_id")!!
                 timetableViewModel.loadGroup(groupId)
+                timetableViewModel.loadGroups()
                 TimetableScreen(navController, timetableViewModel)
             }
             composable(
@@ -90,6 +92,15 @@ fun MainScreen(
                 EventScreen(navController, eventViewModel)
                 // I preload the editEventView model, so when the user wants to edit it, it's already loaded
                 editEventViewModel.loadEvent(groupId, eventId)
+            }
+            composable(
+                AppScreens.EditGroupScreen.route + "/{group_id}",
+                arguments = listOf(
+                    navArgument("group_id") { type = NavType.StringType }
+                )
+            ) {
+                val groupId = it.arguments?.getString("group_id")!!
+                editGroupViewModel.loadGroup(groupId)
             }
         }
     }
