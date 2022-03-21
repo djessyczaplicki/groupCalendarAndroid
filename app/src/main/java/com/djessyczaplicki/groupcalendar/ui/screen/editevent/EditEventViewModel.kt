@@ -27,14 +27,14 @@ class EditEventViewModel : ViewModel() {
         this.groupId = groupId
         this.eventId = eventId
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId) ?: return@launch
             event.value = group.value.events.find{ it.id == eventId } ?: Event()
         }
     }
 
     fun createEvent(newEvent: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             group.value.events += newEvent
             updateGroupEventsUseCase(group.value)
             onSuccessCallback()
@@ -43,7 +43,7 @@ class EditEventViewModel : ViewModel() {
 
     fun createRecurrentEvent(newEvents: MutableList<Event>, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             group.value.events += newEvents
             updateGroupEventsUseCase(group.value)
             onSuccessCallback()
@@ -52,7 +52,7 @@ class EditEventViewModel : ViewModel() {
 
     fun editEvent(editedEvent: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             val event = group.value.events.find{ it.id == eventId } ?: Event()
             event.name = editedEvent.name
             event.description = editedEvent.description
@@ -70,7 +70,7 @@ class EditEventViewModel : ViewModel() {
 
     fun editRecurrentEvent(eventTemplate: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             val allEvents = group.value.events
             val recurrentEvents = allEvents.filter{ recurrentEvent -> recurrentEvent.recurrenceId == eventTemplate.recurrenceId }
             recurrentEvents.forEach { event ->

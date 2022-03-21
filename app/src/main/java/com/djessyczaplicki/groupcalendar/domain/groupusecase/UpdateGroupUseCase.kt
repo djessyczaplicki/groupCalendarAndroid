@@ -1,9 +1,10 @@
 package com.djessyczaplicki.groupcalendar.domain.groupusecase
 
 import com.djessyczaplicki.groupcalendar.data.network.Service
+import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 
-class GetGroupByIdUseCase {
+class UpdateGroupUseCase {
     private val api = Service()
-    suspend operator fun invoke(id: String): Group? = api.getGroupById(id)
+    suspend operator fun invoke(group: Group): Group = api.updateGroup(group)
 }

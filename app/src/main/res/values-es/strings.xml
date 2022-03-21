@@ -56,5 +56,6 @@
     <string name="delete">Eliminar</string>
     <string name="group_name">Nombre del grupo</string>
     <string name="group_description">Descripción del grupo</string>
+    <string name="create_group">Crear un nuevo grupo</string>
 
 </resources>

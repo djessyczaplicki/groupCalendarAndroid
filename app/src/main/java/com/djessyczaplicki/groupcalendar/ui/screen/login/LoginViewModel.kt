@@ -39,9 +39,9 @@ class LoginViewModel : ViewModel() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "signInWithEmail:success")
-                        val user = auth.currentUser
                         val token = auth.getAccessToken(false).result?.token
                         viewModelScope.launch {
+                            Log.i(TAG, auth.currentUser!!.uid)
                             UserPreferences(context).saveAuthToken(token?:"")
                             RetrofitHelper.setToken(token?:"")
                             onSuccessCallback()
@@ -57,10 +57,10 @@ class LoginViewModel : ViewModel() {
 
     fun testAuth(context: Context, onSuccessCallback: () -> Unit) {
         auth = Firebase.auth
-        auth.currentUser.toString()
         if (auth.currentUser != null) {
             auth.getAccessToken(false).addOnCompleteListener {
                 viewModelScope.launch {
+                    Log.i(TAG, auth.currentUser!!.uid)
                     val token = it.result?.token
                     UserPreferences(context).saveAuthToken(token ?: "")
                     RetrofitHelper.setToken(token ?: "")

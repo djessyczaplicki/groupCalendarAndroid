@@ -7,7 +7,7 @@ data class Group(
     var admins: List<String> = emptyList(),
     var events: MutableList<Event> = mutableListOf(),
     var image: String = "",
-    var name: String = "default",
+    var name: String = "",
     var description: String? = null,
     var users: List<String> = emptyList(),
     var notifications: List<Notification> = emptyList()

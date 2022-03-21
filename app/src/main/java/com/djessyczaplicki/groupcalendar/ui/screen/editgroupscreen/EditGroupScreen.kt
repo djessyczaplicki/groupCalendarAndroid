@@ -1,39 +1,69 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 
 @Composable
 fun EditGroupScreen(
     navController: NavController,
     editGroupViewModel: EditGroupViewModel
 ) {
+    val context = LocalContext.current
+    val group = editGroupViewModel.group.value
+    val isEditing = editGroupViewModel.isEditing.value
+
+    var name by rememberSaveable { mutableStateOf(group.name) }
+    var description by rememberSaveable { mutableStateOf(group.description) }
+    var image by rememberSaveable { mutableStateOf(group.image) }
+    var imageBitmap by rememberSaveable { mutableStateOf<Bitmap?>(null) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
+        imageBitmap = if (Build.VERSION.SDK_INT < 28) {
+            MediaStore.Images.Media.getBitmap(
+                context.contentResolver,
+                imageUri
+            )
+        } else {
+            val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+            ImageDecoder.decodeBitmap(source)
+        }
+    }
+
     Column(
         Modifier.verticalScroll(rememberScrollState())
     ) {
-        val group = editGroupViewModel.group.value
-
-        var name by remember { mutableStateOf(group.name) }
-        var description by remember { mutableStateOf(group.description) }
-        var image by remember { mutableStateOf(group.image) }
 
         Text(
             text = stringResource(id = if (!isEditing) R.string.add_event_screen else R.string.edit_event),
@@ -43,9 +73,38 @@ fun EditGroupScreen(
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
         )
-        Image(
-
-        )
+        if (imageBitmap != null) {
+            Image(
+                imageBitmap!!.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clickable {
+                        launcher.launch("image/*")
+                    }
+            )
+            if (editGroupViewModel.isLoading)
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(50.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 30.dp),
+                    strokeWidth = 5.dp
+                )
+        } else {
+            SubcomposeAsyncImage(
+                model = image,
+                loading = {
+                    CircularProgressIndicator()
+                },
+                contentDescription = null,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clickable {
+                        launcher.launch("image/*")
+                    }
+            )
+        }
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
@@ -67,23 +126,35 @@ fun EditGroupScreen(
                 .fillMaxWidth()
                 .padding(4.dp)
         )
+
+        Button(onClick = {
+            if (!editGroupViewModel.isLoading) {
+                val newGroup = Group(
+                    name = name,
+                    description = description
+                )
+                editGroupViewModel.editGroup(newGroup, imageBitmap) {
+//                    Doesn't work because the group isn't created yet when the app tries to load the view
+//                    navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
+//                        popUpTo(0)
+//                    }
+                    navController.popBackStack()
+                }
+            }
+        }) {
+            Text("Send")
+        }
     }
 }
 
-private fun openGallery() {
-    val intent = Intent(Intent.ACTION_GET_CONTENT)
-    intent.type = "image/*"
-    startForActivityGallery.launch(intent)
-}
-
-private val startForActivityGallery = rememberLauncherForActivityResult(
-    ActivityResultContracts.StartActivityForResult()
-){ result ->
-
-    if (result.resultCode == Activity.RESULT_OK) {
-        val data = result.data?.data
-        binding.ImageViewObject.setImageURI(data)
-        UserCollections.ImageDataFromCollection = data
-    }
-
-}
+//private val startForActivityGallery = rememberLauncherForActivityResult(
+//    ActivityResultContracts.StartActivityForResult()
+//){ result ->
+//
+//    if (result.resultCode == Activity.RESULT_OK) {
+//        val data = result.data?.data
+//        binding.ImageViewObject.setImageURI(data)
+//        UserCollections.ImageDataFromCollection = data
+//    }
+//
+//}

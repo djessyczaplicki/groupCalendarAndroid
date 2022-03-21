@@ -2,6 +2,7 @@ package com.djessyczaplicki.groupcalendar.data.network
 
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
+import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -25,6 +26,28 @@ interface ApiClient {
         @Path("groupId") groupId: String
     ): Response<List<Event>>
 
+    @PUT("/groups/{groupId}.json")
+    suspend fun updateGroup(
+        @Body group: Group,
+        @Path("groupId") groupId: String
+    ): Response<Group>
+
+    @GET("/users/{id}.json")
+    suspend fun getUser(
+        @Path("id") id: String
+    ): Response<User>
+
+    @PUT("/users/{userId}.json")
+    suspend fun updateUser(
+        @Body user: User,
+        @Path("userId") userId: String
+    ): Response<User>
+
+//    @POST("/groups/{groupId}")
+//    suspend fun createGroup(
+//        @Body group: Group,
+//        @Path("groupId") groupId: String
+//    ): Response<Group>
 
 
 }

@@ -21,14 +21,14 @@ class EventViewModel : ViewModel() {
     fun loadEvent(groupId: String, eventId: String) {
         this.groupId = groupId
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             event.value = group.value.events.find{ it.id == eventId } ?: Event()
         }
     }
 
     fun delete(onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             val updatedGroup = group.value
             updatedGroup.events.removeAll{ it.id == event.value.id }
             group.value.events = updateGroupEventsUseCase(updatedGroup).toMutableList()
@@ -38,7 +38,7 @@ class EventViewModel : ViewModel() {
 
     fun deleteAll(onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId)
+            group.value = getGroupByIdUseCase(groupId)!!
             val updatedGroup = group.value
             updatedGroup.events.removeAll{ it.recurrenceId == event.value.recurrenceId!! }
             group.value.events = updateGroupEventsUseCase(updatedGroup).toMutableList()

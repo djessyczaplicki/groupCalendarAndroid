@@ -2,6 +2,7 @@ package com.djessyczaplicki.groupcalendar.ui.screen
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -14,6 +15,7 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginScreen
@@ -54,7 +56,9 @@ fun MainScreen(
             ) {
                 val groupId = it.arguments?.getString("group_id")!!
                 timetableViewModel.loadGroup(groupId)
-                timetableViewModel.loadGroups()
+                LaunchedEffect("") {
+                    timetableViewModel.loadGroups()
+                }
                 TimetableScreen(navController, timetableViewModel)
             }
             composable(
@@ -101,6 +105,12 @@ fun MainScreen(
             ) {
                 val groupId = it.arguments?.getString("group_id")!!
                 editGroupViewModel.loadGroup(groupId)
+                EditGroupScreen(navController, editGroupViewModel)
+            }
+            composable(
+                AppScreens.EditGroupScreen.route
+            ) {
+                EditGroupScreen(navController, editGroupViewModel)
             }
         }
     }
