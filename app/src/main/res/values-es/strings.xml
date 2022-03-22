@@ -17,6 +17,7 @@
     <string name="saturday_short">Sáb.</string>
     <string name="sunday_short">Dom.</string>
     <string name="username">Nombre de usuario:</string>
+    <string name="email">Correo</string>
     <string name="wrong_credentials">Combinación usuario contraseña erronea</string>
     <string name="login">Conectarse</string>
     <string name="password">Contraseña</string>
@@ -57,5 +58,9 @@
     <string name="group_name">Nombre del grupo</string>
     <string name="group_description">Descripción del grupo</string>
     <string name="create_group">Crear un nuevo grupo</string>
+    <string name="show_all_events">Ver todos los eventos</string>
+    <string name="select_a_group">Seleciona un grupo:</string>
+    <string name="add_event_to">Añadir evento a</string>
+    <string name="edit_event_from">Editar evento de</string>
 
 </resources>

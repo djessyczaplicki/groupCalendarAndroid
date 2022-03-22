@@ -13,7 +13,9 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class TimetableViewModel: ViewModel() {
+    val events = mutableStateOf(listOf<Event>())
     val groups = mutableStateOf(listOf<Group>())
+    val shownGroups = mutableStateOf(listOf<Group>())
     val group = mutableStateOf(Group())
     val groupId = mutableStateOf("")
 
@@ -50,6 +52,33 @@ class TimetableViewModel: ViewModel() {
         viewModelScope.launch {
             group.events.remove(event)
             updateGroupEventsUseCase(group)
+        }
+    }
+
+    fun loadShownGroups(groupIds: List<String>) {
+        val groups = mutableListOf<Group>()
+        viewModelScope.launch {
+            groupIds.forEach { groupId ->
+                val group = getGroupByIdUseCase(groupId)
+                if (group != null) {
+                    groups += group
+                }
+            }
+            shownGroups.value = groups
+            loadEvents()
+        }
+    }
+
+    private fun loadEvents() {
+        events.value = listOf()
+        events.value = shownGroups.value.fold(listOf()) { acc, group ->
+            acc + group.events
+        }
+    }
+
+    fun findParentGroup(event: Event): Group? {
+        return shownGroups.value.find { group ->
+            group.events.contains(event)
         }
     }
 }

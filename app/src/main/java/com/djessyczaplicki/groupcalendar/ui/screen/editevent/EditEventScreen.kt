@@ -33,6 +33,7 @@ fun EditEventScreen(
     editEventViewModel: EditEventViewModel
 ) {
     val isEditing = editEventViewModel.isEditing.value
+    val group = editEventViewModel.group.value
     val event = editEventViewModel.event.value
     var name by rememberSaveable { mutableStateOf(event.name) }
     var description by rememberSaveable { mutableStateOf(event.description ?: "") }
@@ -54,7 +55,7 @@ fun EditEventScreen(
     ) {
 
         Text(
-            text = stringResource(id = if (!isEditing) R.string.add_event_screen else R.string.edit_event),
+            text = stringResource(id = if (!isEditing) R.string.add_event_to else R.string.edit_event_from) + " ${group.name}",
             modifier = Modifier
                 .height(30.dp)
                 .padding(4.dp),
@@ -309,7 +310,6 @@ fun EditEventScreen(
                             }
                         }
                     }
-
                 }
             ) {
                 Text(stringResource(id = if (isEditing) R.string.edit_event else R.string.create_event))

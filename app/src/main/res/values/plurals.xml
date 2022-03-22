@@ -1,0 +1,6 @@
+<resources>
+    <plurals name="timetable_title">
+        <item quantity="one">Timetable</item>
+        <item quantity="other">Timetables</item>
+    </plurals>
+</resources>

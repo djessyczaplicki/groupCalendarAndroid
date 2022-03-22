@@ -45,13 +45,14 @@ fun MainScreen(
                 )
             }
             composable(
-                AppScreens.TimetableScreen.route + AppScreensVariables.GroupId.variable,
+                AppScreens.TimetableScreen.route + AppScreensVariables.GroupIds.variable,
                 arguments = listOf(
-                    navArgument("group_id") { type = NavType.StringType }
+                    navArgument("group_ids") { type = NavType.StringType }
                 )
             ) {
-                val groupId = it.arguments?.getString("group_id")!!
-                timetableViewModel.loadGroup(groupId)
+                val groupIdsString = it.arguments?.getString("group_ids")!!
+                val groupIds = groupIdsString.split(",")
+                timetableViewModel.loadShownGroups(groupIds)
                 LaunchedEffect("") {
                     timetableViewModel.loadGroups()
                 }
@@ -75,9 +76,12 @@ fun MainScreen(
                     navArgument("group_id") { type = NavType.StringType }
                 )
             ) {
+                // These two lines are used to reset the values
                 editEventViewModel.event.value = Event()
                 editEventViewModel.isEditing.value = false
+
                 editEventViewModel.groupId = it.arguments?.getString("group_id")!!
+                editEventViewModel.loadGroup()
                 EditEventScreen(navController, editEventViewModel)
             }
             composable(

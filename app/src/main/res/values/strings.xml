@@ -16,6 +16,7 @@
     <string name="saturday_short">Sat.</string>
     <string name="sunday_short">Sun.</string>
     <string name="username">Username</string>
+    <string name="email">Email address</string>
     <string name="wrong_credentials">Wrong credentials</string>
     <string name="login">Login</string>
     <string name="password">Password</string>
@@ -30,9 +31,9 @@
     <string name="selected_date">Selected date:</string>
     <string name="start_time">Starts at</string>
     <string name="end_time">Ends at</string>
-    <string name="is_recurrent">Is recurrent?</string>
+    <string name="is_recurrent">Is it recurrent?</string>
     <string name="select_week_day">Select a week day:</string>
-    <string name="require_confirmation">Requires confirmation of the participants ?</string>
+    <string name="require_confirmation">Does it require confirmation from the participants ?</string>
     <string name="edit_event">Edit event</string>
     <string name="edit_event_screen">Edit event</string>
     <string name="this_is_a_recurrent_event">This is a recurrent event</string>
@@ -56,4 +57,9 @@
     <string name="group_name">Group Name</string>
     <string name="group_description">Group description</string>
     <string name="create_group">Create a new group</string>
+    <string name="show_all_events">Show all events</string>
+    <string name="select_a_group">Select a group:</string>
+    <string name="add_event_to">Add event to</string>
+    <string name="edit_event_from">Edit event from</string>
+
 </resources>

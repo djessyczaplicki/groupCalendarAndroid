@@ -29,6 +29,12 @@ class EditEventViewModel : ViewModel() {
         }
     }
 
+    fun loadGroup() {
+        viewModelScope.launch {
+            group.value = getGroupByIdUseCase(groupId) ?: return@launch
+        }
+    }
+
     fun createEvent(newEvent: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)!!
@@ -51,36 +57,55 @@ class EditEventViewModel : ViewModel() {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)!!
             val event = group.value.events.find{ it.id == eventId } ?: Event()
-            event.name = editedEvent.name
-            event.description = editedEvent.description
-            event.color = editedEvent.color
-            event.recurrenceId = editedEvent.recurrenceId
-            event.start = editedEvent.start
-            event.requireConfirmation = editedEvent.requireConfirmation
-            event.end = editedEvent.end
-
+            overwriteEventData(event, editedEvent)
             updateGroupEventsUseCase(group.value)
             onSuccessCallback()
         }
 
     }
 
+    private fun overwriteEventData(
+        event: Event,
+        editedEvent: Event
+    ) {
+        event.name = editedEvent.name
+        event.description = editedEvent.description
+        event.color = editedEvent.color
+        event.recurrenceId = editedEvent.recurrenceId
+        event.start = editedEvent.start
+        event.requireConfirmation = editedEvent.requireConfirmation
+        event.end = editedEvent.end
+    }
+
     fun editRecurrentEvent(eventTemplate: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)!!
             val allEvents = group.value.events
-            val recurrentEvents = allEvents.filter{ recurrentEvent -> recurrentEvent.recurrenceId == eventTemplate.recurrenceId }
+            val recurrentEvents = allEvents.filter{ recurrentEvent ->
+                recurrentEvent.recurrenceId == eventTemplate.recurrenceId
+            }
             recurrentEvents.forEach { event ->
-                event.start = event.start.with(eventTemplate.start.dayOfWeek).withHour(eventTemplate.start.hour).withMinute(eventTemplate.start.minute)
-                event.end = event.end.with(eventTemplate.end.dayOfWeek).withHour(eventTemplate.end.hour).withMinute(eventTemplate.end.minute)
-                event.color = eventTemplate.color
-                event.name = eventTemplate.name
-                event.requireConfirmation = eventTemplate.requireConfirmation
-                event.description = eventTemplate.description
+                overwriteRecurrentEventData(event, eventTemplate)
             }
             updateGroupEventsUseCase(group.value)
             onSuccessCallback()
         }
+    }
+
+    private fun overwriteRecurrentEventData(
+        event: Event,
+        eventTemplate: Event
+    ) {
+        event.start =
+            event.start.with(eventTemplate.start.dayOfWeek).withHour(eventTemplate.start.hour)
+                .withMinute(eventTemplate.start.minute)
+        event.end =
+            event.end.with(eventTemplate.end.dayOfWeek).withHour(eventTemplate.end.hour)
+                .withMinute(eventTemplate.end.minute)
+        event.color = eventTemplate.color
+        event.name = eventTemplate.name
+        event.requireConfirmation = eventTemplate.requireConfirmation
+        event.description = eventTemplate.description
     }
 
 

@@ -1,13 +1,12 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
-import android.content.Intent
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -17,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -27,16 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
-import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
 import com.djessyczaplicki.groupcalendar.ui.item.DrawerContent
+import com.djessyczaplicki.groupcalendar.ui.item.GroupRow
 import com.djessyczaplicki.groupcalendar.ui.item.TopBar
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import java.lang.Integer.max
 import java.time.DayOfWeek
@@ -69,7 +67,7 @@ fun TimetableScreen(
                 }
 
                 navController.navigate(route) {
-                    popUpTo = navController.graph.startDestinationId
+                    popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
             }
@@ -77,8 +75,11 @@ fun TimetableScreen(
     ) {
         Scaffold(
             topBar = {
+                val resources = LocalContext.current.resources
+                val shownGroups = timetableViewModel.shownGroups.value
+                val groupNames = shownGroups.joinToString { it.name }
                 TopBar(
-                    title = stringResource(id = R.string.timetable_screen) + ": ${timetableViewModel.group.value.name}",
+                    title = resources.getQuantityString(R.plurals.timetable_title, shownGroups.size) + ": $groupNames",
                     navController = navController,
                     onButtonClicked = {
                         scope.launch {
@@ -96,7 +97,12 @@ fun TimetableScreen(
                 LaunchedEffect(Unit) { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
 
                 HorizontalPager(count = 200, state = pagerState ) { pageNum ->
-                    TimetablePage(navController = navController, timetableViewModel = timetableViewModel, weeksToAdd = pageNum - 100, scrollState = scrollState)
+                    TimetablePage(
+                        navController = navController,
+                        timetableViewModel = timetableViewModel,
+                        weeksToAdd = pageNum - 100,
+                        scrollState = scrollState
+                    )
                     page = pagerState.currentPage
                 }
                 LaunchedEffect("key1") {
@@ -118,7 +124,6 @@ fun TimetablePage(
     weeksToAdd: Int,
     scrollState: ScrollState
 ) {
-    val group = timetableViewModel.group.value
     val day = LocalDate.now().plusWeeks(weeksToAdd.toLong())
     // https://stackoverflow.com/questions/28450720/get-date-of-first-day-of-week-based-on-localdate-now-in-java-8
     val dayOfWeek = DayOfWeek.MONDAY
@@ -126,7 +131,8 @@ fun TimetablePage(
         mutableStateOf(day.with(dayOfWeek))
     }
     val lastDateOfWeek = firstDateOfWeek.plusDays(7)
-    val eventsOfTheWeek = group.events.filter { event ->
+    val events = timetableViewModel.events.value
+    val eventsOfTheWeek = events.filter { event ->
         event.start.isAfter(firstDateOfWeek.atStartOfDay())
         && event.end.isBefore(lastDateOfWeek.plusDays(1L).atStartOfDay())
     }
@@ -138,8 +144,11 @@ fun TimetablePage(
             minDate = firstDateOfWeek,
             maxDate = lastDateOfWeek,
             eventContent = { event ->
+                val group = timetableViewModel.findParentGroup(event)
                 BasicEvent(event = event) {
-                    navController.navigate(AppScreens.EventScreen.route + "/${group.id}/${event.id}")
+                    if (group != null) {
+                        navController.navigate(AppScreens.EventScreen.route + "/${group.id}/${event.id}")
+                    }
                 }
             },
             scrollState = scrollState
@@ -349,8 +358,34 @@ private class EventDataModifier(
 
 @Composable
 fun TimetableFAB(navController: NavController, timetableViewModel: TimetableViewModel) {
-    val group = timetableViewModel.group.value
-    FloatingActionButton(onClick = { navController.navigate(AppScreens.EditEventScreen.route + "/${group.id}") }) {
+    var isDialogShown by remember { mutableStateOf(false) }
+    val shownGroups = timetableViewModel.shownGroups.value
+    FloatingActionButton(
+        onClick = {
+            if (shownGroups.size == 1) navController.navigate(AppScreens.EditEventScreen.route
+                    + "/${shownGroups[0].id}")
+            else
+                isDialogShown = true
+        }) {
         Text("+")
+    }
+    if (isDialogShown) {
+        AlertDialog(
+            onDismissRequest = { isDialogShown = false },
+            title = { Text (stringResource(id = R.string.select_a_group)) },
+            buttons = {
+                LazyColumn {
+                    items(shownGroups) { group ->
+                        GroupRow(
+                            onDestinationClicked = {
+                                navController.navigate(AppScreens.EditEventScreen.route
+                                        + "/${group.id}")
+                            },
+                            group = group
+                        )
+                    }
+                }
+            }
+        )
     }
 }
