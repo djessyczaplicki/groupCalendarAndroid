@@ -1,7 +1,5 @@
 package com.djessyczaplicki.groupcalendar.util
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.capitalize
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.*

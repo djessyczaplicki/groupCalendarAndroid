@@ -2,23 +2,15 @@ package com.djessyczaplicki.groupcalendar.ui.screen.login
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.initialize
-import com.orhanobut.logger.Logger
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {

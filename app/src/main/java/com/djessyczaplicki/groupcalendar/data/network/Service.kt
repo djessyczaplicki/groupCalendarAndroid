@@ -5,14 +5,6 @@ import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GetTokenResult
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.google.gson.JsonObject
-import com.orhanobut.logger.Logger
-import org.json.JSONObject
 
 class Service {
     private val TAG = "Service"

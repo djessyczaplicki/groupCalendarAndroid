@@ -10,7 +10,7 @@ import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import kotlinx.coroutines.launch
 
 class EventViewModel : ViewModel() {
-    lateinit var groupId: String
+    private lateinit var groupId: String
 
     val getGroupByIdUseCase = GetGroupByIdUseCase()
     val updateGroupEventsUseCase = UpdateGroupEventsUseCase()

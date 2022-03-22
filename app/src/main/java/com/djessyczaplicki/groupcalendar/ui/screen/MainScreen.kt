@@ -3,19 +3,16 @@ package com.djessyczaplicki.groupcalendar.ui.screen
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupScreen
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginScreen
@@ -33,7 +30,6 @@ fun MainScreen(
     editGroupViewModel: EditGroupViewModel,
     intent: Intent
 ) {
-    val context = LocalContext.current
 
     GroupCalendarTheme {
         val navController = rememberNavController()
@@ -49,7 +45,7 @@ fun MainScreen(
                 )
             }
             composable(
-                AppScreens.TimetableScreen.route + "/{group_id}",
+                AppScreens.TimetableScreen.route + AppScreensVariables.GroupId.variable,
                 arguments = listOf(
                     navArgument("group_id") { type = NavType.StringType }
                 )
@@ -62,18 +58,19 @@ fun MainScreen(
                 TimetableScreen(navController, timetableViewModel)
             }
             composable(
-                AppScreens.EditEventScreen.route + "/{group_id}/{event_id}",
+                AppScreens.EditEventScreen.route
+                        + AppScreensVariables.GroupId.variable
+                        + AppScreensVariables.EventId.variable,
                 arguments = listOf(
                     navArgument("group_id") { type = NavType.StringType },
                     navArgument("event_id") { type = NavType.StringType }
                 )
             ) {
-                val isLoading = remember { mutableStateOf(false) }
                 editEventViewModel.isEditing.value = true
                 EditEventScreen(navController, editEventViewModel)
             }
             composable(
-                AppScreens.EditEventScreen.route + "/{group_id}",
+                AppScreens.EditEventScreen.route + AppScreensVariables.GroupId.variable,
                 arguments = listOf(
                     navArgument("group_id") { type = NavType.StringType }
                 )
@@ -84,7 +81,9 @@ fun MainScreen(
                 EditEventScreen(navController, editEventViewModel)
             }
             composable(
-                AppScreens.EventScreen.route + "/{group_id}/{event_id}",
+                AppScreens.EventScreen.route
+                        + AppScreensVariables.GroupId.variable
+                        + AppScreensVariables.EventId.variable,
                 arguments = listOf(
                     navArgument("group_id") { type = NavType.StringType },
                     navArgument("event_id") { type = NavType.StringType }
@@ -98,7 +97,7 @@ fun MainScreen(
                 editEventViewModel.loadEvent(groupId, eventId)
             }
             composable(
-                AppScreens.EditGroupScreen.route + "/{group_id}",
+                AppScreens.EditGroupScreen.route + AppScreensVariables.GroupId.variable,
                 arguments = listOf(
                     navArgument("group_id") { type = NavType.StringType }
                 )

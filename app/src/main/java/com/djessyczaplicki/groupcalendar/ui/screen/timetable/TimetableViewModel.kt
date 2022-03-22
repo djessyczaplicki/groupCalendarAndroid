@@ -1,8 +1,6 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event

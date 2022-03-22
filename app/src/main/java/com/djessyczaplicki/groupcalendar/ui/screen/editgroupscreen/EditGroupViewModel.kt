@@ -1,6 +1,5 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen
 
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 
 class EditGroupViewModel : ViewModel() {

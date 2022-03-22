@@ -3,11 +3,11 @@ package com.djessyczaplicki.groupcalendar.data.network
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
-import com.google.firebase.auth.GetTokenResult
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 
 interface ApiClient {

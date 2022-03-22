@@ -17,6 +17,10 @@ import com.google.firebase.storage.ktx.storage
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 
+/**
+ * @author Djessy Czaplicki
+ */
+
 class MainActivity : ComponentActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels()
