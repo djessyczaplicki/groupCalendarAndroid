@@ -107,12 +107,17 @@ fun MainScreen(
                 )
             ) {
                 val groupId = it.arguments?.getString("group_id")!!
-                editGroupViewModel.loadGroup(groupId)
+                editGroupViewModel.groupId = groupId
+                editGroupViewModel.isEditing.value = true
                 EditGroupScreen(navController, editGroupViewModel)
             }
             composable(
                 AppScreens.EditGroupScreen.route
             ) {
+                // resetting values
+                editGroupViewModel.groupId = null
+                editGroupViewModel.isEditing.value = false
+
                 EditGroupScreen(navController, editGroupViewModel)
             }
         }

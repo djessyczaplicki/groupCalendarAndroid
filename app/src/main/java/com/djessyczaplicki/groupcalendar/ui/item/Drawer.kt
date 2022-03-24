@@ -10,6 +10,8 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -58,7 +60,7 @@ fun DrawerContent(
         }
         groups.forEach { group ->
             item {
-                GroupRow(onDestinationClicked, group)
+                GroupRow(onDestinationClicked, group, Icons.Filled.Edit)
                 Spacer(Modifier.height(5.dp))
             }
         }

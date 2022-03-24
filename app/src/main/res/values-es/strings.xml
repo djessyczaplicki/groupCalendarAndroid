@@ -62,5 +62,6 @@
     <string name="select_a_group">Seleciona un grupo:</string>
     <string name="add_event_to">Añadir evento a</string>
     <string name="edit_event_from">Editar evento de</string>
+    <string name="edit">Editar</string>
 
 </resources>

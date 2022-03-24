@@ -30,10 +30,10 @@ class EditGroupViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     val isEditing = mutableStateOf(false)
 
-    fun loadGroup(groupId: String) {
-        this.groupId = groupId
+    fun loadGroup(onGroupLoaded: (group: Group) -> Unit) {
         viewModelScope.launch {
-            group.value = getGroupByIdUseCase(groupId) ?: return@launch
+            group.value = getGroupByIdUseCase(groupId!!) ?: return@launch
+            onGroupLoaded(group.value)
         }
     }
 
@@ -58,8 +58,10 @@ class EditGroupViewModel : ViewModel() {
             updateGroupUseCase(group)
             val uid = Firebase.auth.currentUser!!.uid
             val user = getUserByIdUseCase(uid)
-            user.groups += group.id
-            updateUserUseCase(user)
+            if (!user.groups.contains(group.id)) {
+                user.groups += group.id
+                updateUserUseCase(user)
+            }
             onSuccessCallback()
             isLoading = false
         }

@@ -61,5 +61,7 @@
     <string name="select_a_group">Select a group:</string>
     <string name="add_event_to">Add event to</string>
     <string name="edit_event_from">Edit event from</string>
+    <string name="edit">Edit</string>
+    <string name="image_placeholder_url" translatable="false">https://uning.es/wp-content/uploads/2016/08/ef3-placeholder-image.jpg</string>
 
 </resources>
