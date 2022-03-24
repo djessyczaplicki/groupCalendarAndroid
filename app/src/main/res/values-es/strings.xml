@@ -63,5 +63,11 @@
     <string name="add_event_to">Añadir evento a</string>
     <string name="edit_event_from">Editar evento de</string>
     <string name="edit">Editar</string>
+    <string name="menu">menu</string>
+    <string name="members">Miembros</string>
+    <string name="admin">Admin</string>
+    <string name="user">Usuario</string>
+    <string name="remove_user">Quitar usuario</string>
+    <string name="make_admin">Hacer admin</string>
 
 </resources>

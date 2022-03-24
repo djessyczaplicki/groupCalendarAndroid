@@ -63,5 +63,11 @@
     <string name="edit_event_from">Edit event from</string>
     <string name="edit">Edit</string>
     <string name="image_placeholder_url" translatable="false">https://uning.es/wp-content/uploads/2016/08/ef3-placeholder-image.jpg</string>
+    <string name="menu">menu</string>
+    <string name="members">Members</string>
+    <string name="admin">Admin</string>
+    <string name="user">User</string>
+    <string name="remove_user">Remove user</string>
+    <string name="make_admin">Make Admin</string>
 
 </resources>

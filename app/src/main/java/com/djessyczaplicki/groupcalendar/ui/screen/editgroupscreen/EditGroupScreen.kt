@@ -6,28 +6,31 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
+import com.djessyczaplicki.groupcalendar.data.remote.model.User
+import com.djessyczaplicki.groupcalendar.ui.item.UserRow
 
 @Composable
 fun EditGroupScreen(
@@ -36,6 +39,7 @@ fun EditGroupScreen(
 ) {
     val context = LocalContext.current
     val isEditing = editGroupViewModel.isEditing.value
+    val group = editGroupViewModel.group.value
 
     var name by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
@@ -61,6 +65,7 @@ fun EditGroupScreen(
                 name = group.name
                 description = group.description ?: ""
                 image = group.image
+                editGroupViewModel.loadUsers()
             }
         }
     }
@@ -134,14 +139,48 @@ fun EditGroupScreen(
                 .fillMaxWidth()
                 .padding(4.dp)
         )
+
+        Text(
+            text = stringResource(id = R.string.members),
+            modifier = Modifier.padding(10.dp)
+        )
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp)
+                .requiredHeightIn(max = 300.dp)
+                .border(
+                    BorderStroke(1.dp, colorResource(id = R.color.lighter_grey)),
+                    shape = RectangleShape
+                )
+        ) {
+            items(editGroupViewModel.users.value) { user ->
+                var isExpanded by remember { mutableStateOf(false) }
+                val isAdmin = group.admins.contains(user.id)
+                UserRow(user, isAdmin, Icons.Filled.MoreVert) {
+                    isExpanded = true
+                }
+
+                DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+                    DropdownMenuItem(onClick = { /*TODO*/ }) {
+                        Text(stringResource(R.string.make_admin))
+                    }
+                    DropdownMenuItem(onClick = { /*TODO*/ }) {
+                        Text(stringResource(R.string.remove_user))
+                    }
+                }
+            }
+        }
+
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Button(
-                onClick = {
-                    if (!editGroupViewModel.isLoading) {
+            if (name.isNotBlank()) {
+                Button(
+                    onClick = {
+                        if (editGroupViewModel.isLoading) return@Button
                         if (isEditing) {
                             val group = editGroupViewModel.group.value
                             group.name = name
@@ -155,16 +194,16 @@ fun EditGroupScreen(
                                 description = description
                             )
                             editGroupViewModel.editGroup(newGroup, imageBitmap) {
-                    //                             Doesn't work because the group isn't created yet when the app tries to load the view
-                    //                                navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
-                    //                                    popUpTo(0)
-                    //                                }
+                                //                             Doesn't work because the group isn't created yet when the app tries to load the view
+                                //                                navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
+                                //                                    popUpTo(0)
+                                //                                }
                                 navController.popBackStack()
                             }
                         }
-                    }
-                }) {
-                Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                    }) {
+                    Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                }
             }
         }
     }

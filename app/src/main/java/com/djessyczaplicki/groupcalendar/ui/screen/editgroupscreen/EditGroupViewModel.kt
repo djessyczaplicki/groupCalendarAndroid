@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
+import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.StoreGroupImageUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.UpdateGroupUseCase
@@ -26,6 +27,7 @@ class EditGroupViewModel : ViewModel() {
     val updateUserUseCase = UpdateUserUseCase()
     val storeGroupImageUseCase = StoreGroupImageUseCase()
 
+    val users = mutableStateOf(listOf<User>())
     val group = mutableStateOf(Group())
     var isLoading by mutableStateOf(false)
     val isEditing = mutableStateOf(false)
@@ -34,6 +36,14 @@ class EditGroupViewModel : ViewModel() {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId!!) ?: return@launch
             onGroupLoaded(group.value)
+        }
+    }
+
+    fun loadUsers() {
+        viewModelScope.launch {
+            group.value.users.forEach { userId ->
+                users.value += getUserByIdUseCase(userId)
+            }
         }
     }
 
