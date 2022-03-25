@@ -69,5 +69,6 @@
     <string name="user">User</string>
     <string name="remove_user">Remove user</string>
     <string name="make_admin">Make Admin</string>
+    <string name="dismiss_as_admin">Dismiss as admin</string>
 
 </resources>

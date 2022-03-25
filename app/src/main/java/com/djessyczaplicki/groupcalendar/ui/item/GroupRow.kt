@@ -34,7 +34,9 @@ fun GroupRow(
         modifier = Modifier
             .clickable { onDestinationClicked(AppScreens.TimetableScreen.route + "/${group.id}") }
             .fillMaxWidth()
+            .padding(horizontal = 15.dp, vertical = 8.dp).fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 8.dp)
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically

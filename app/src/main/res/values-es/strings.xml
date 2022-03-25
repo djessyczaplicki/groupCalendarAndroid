@@ -68,6 +68,7 @@
     <string name="admin">Admin</string>
     <string name="user">Usuario</string>
     <string name="remove_user">Quitar usuario</string>
-    <string name="make_admin">Hacer admin</string>
+    <string name="make_admin">Designar como admin. del grupo</string>
+    <string name="dismiss_as_admin">Descartar como admin. del grupo</string>
 
 </resources>

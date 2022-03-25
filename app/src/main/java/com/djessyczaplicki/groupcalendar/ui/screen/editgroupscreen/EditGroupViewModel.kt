@@ -41,23 +41,24 @@ class EditGroupViewModel : ViewModel() {
 
     fun loadUsers() {
         viewModelScope.launch {
+            users.value = mutableListOf()
             group.value.users.forEach { userId ->
                 users.value += getUserByIdUseCase(userId)
             }
         }
     }
 
-    fun editGroup(group: Group, imageBitmap: Bitmap?, onSuccessCallback: () -> Unit) {
+    fun editGroup(editedGroup: Group, imageBitmap: Bitmap?, onSuccessCallback: () -> Unit) {
         isLoading = true
         if (imageBitmap != null) {
-            storeGroupImageUseCase(group.id, imageBitmap) { imageUri ->
-                group.image = imageUri.toString()
-                updateGroup(group) {
+            storeGroupImageUseCase(editedGroup.id, imageBitmap) { imageUri ->
+                editedGroup.image = imageUri.toString()
+                updateGroup(editedGroup) {
                     onSuccessCallback()
                 }
             }
         } else {
-            updateGroup(group) {
+            updateGroup(editedGroup) {
                 onSuccessCallback()
             }
         }
@@ -74,6 +75,38 @@ class EditGroupViewModel : ViewModel() {
             }
             onSuccessCallback()
             isLoading = false
+        }
+    }
+
+    fun makeUserAdmin(user: User) {
+        viewModelScope.launch {
+            if (group.value.admins.contains(user.id)) return@launch
+
+            group.value.admins += user.id
+            group.value = updateGroupUseCase(group.value)
+        }
+    }
+
+    fun dismissAsAdmin(user: User) {
+        viewModelScope.launch {
+            if (!group.value.admins.contains(user.id)) return@launch
+
+            val admins = group.value.admins.filterNot { it == user.id }
+            group.value.admins = admins
+            group.value = updateGroupUseCase(group.value)
+        }
+    }
+
+    fun removeUserFromGroup(user: User) {
+        viewModelScope.launch {
+            if (!group.value.users.contains(user.id)) return@launch
+
+            val users = group.value.users.filterNot { it == user.id }
+            val admins = group.value.users.filterNot { it == user.id }
+            group.value.users = users
+            group.value.admins = admins
+            group.value = updateGroupUseCase(group.value)
+            loadUsers()
         }
     }
 

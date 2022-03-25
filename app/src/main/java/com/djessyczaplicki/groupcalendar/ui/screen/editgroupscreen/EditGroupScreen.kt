@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
@@ -24,13 +23,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
-import com.djessyczaplicki.groupcalendar.data.remote.model.User
-import com.djessyczaplicki.groupcalendar.ui.item.UserRow
+import com.djessyczaplicki.groupcalendar.ui.item.GroupUserRow
 
 @Composable
 fun EditGroupScreen(
@@ -61,6 +58,7 @@ fun EditGroupScreen(
     // load group if groupId is set
     LaunchedEffect(key1 = editGroupViewModel.groupId) {
         if (editGroupViewModel.groupId != null) {
+            editGroupViewModel.group.value = Group()
             editGroupViewModel.loadGroup { group ->
                 name = group.name
                 description = group.description ?: ""
@@ -144,6 +142,7 @@ fun EditGroupScreen(
             text = stringResource(id = R.string.members),
             modifier = Modifier.padding(10.dp)
         )
+
         LazyColumn(
             Modifier
                 .fillMaxWidth()
@@ -155,22 +154,15 @@ fun EditGroupScreen(
                 )
         ) {
             items(editGroupViewModel.users.value) { user ->
-                var isExpanded by remember { mutableStateOf(false) }
-                val isAdmin = group.admins.contains(user.id)
-                UserRow(user, isAdmin, Icons.Filled.MoreVert) {
-                    isExpanded = true
-                }
 
-                DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-                    DropdownMenuItem(onClick = { /*TODO*/ }) {
-                        Text(stringResource(R.string.make_admin))
-                    }
-                    DropdownMenuItem(onClick = { /*TODO*/ }) {
-                        Text(stringResource(R.string.remove_user))
-                    }
+                Box {
+                    GroupUserRow(user, group, editGroupViewModel)
+
                 }
             }
         }
+
+
 
         Row(
             horizontalArrangement = Arrangement.Center,
