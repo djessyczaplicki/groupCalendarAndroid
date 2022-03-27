@@ -6,10 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.google.firebase.ktx.Firebase
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
     private val eventViewModel: EventViewModel by viewModels()
     private val editEventViewModel: EditEventViewModel by viewModels()
     private val editGroupViewModel: EditGroupViewModel by viewModels()
+    private val inviteViewModel: InviteViewModel by viewModels()
     private val storage = Firebase.storage
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +44,7 @@ class MainActivity : ComponentActivity() {
                 eventViewModel,
                 editEventViewModel,
                 editGroupViewModel,
+                inviteViewModel,
                 intent
             )
         }
@@ -56,10 +59,20 @@ class MainActivity : ComponentActivity() {
         val appLinkAction = intent.action
         val appLinkData: Uri? = intent.data
         if (Intent.ACTION_VIEW == appLinkAction) {
-            appLinkData?.lastPathSegment?.also { groupId ->
-                intent.putExtra("group_id", groupId)
-                // https://developer.android.com/studio/write/app-link-indexing
+            val args = appLinkData?.encodedPath?.split("/")
+            val option = args?.get(1)
+            val value = args?.get(2)
+            when (option) {
+                "group" -> intent.putExtra("group_id", value)
+                "invite" -> intent.putExtra("invite", value)
+                "event" -> intent.putExtra("event", value)
             }
         }
+
+//            appLinkData?.lastPathSegment?.also { groupId ->
+//                intent.putExtra("group_id", groupId)
+//                // https://developer.android.com/studio/write/app-link-indexing
+//            }
+//        }
     }
 }

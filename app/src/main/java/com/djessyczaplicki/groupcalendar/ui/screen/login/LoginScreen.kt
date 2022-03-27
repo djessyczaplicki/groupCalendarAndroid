@@ -48,17 +48,27 @@ fun LoginScreen (
     val auth = Firebase.auth
 
     fun success() {
-        if (!intent.getStringExtra("group_id").isNullOrBlank()){
+        if (!intent.getStringExtra("invite").isNullOrBlank()) {
+            val groupId = intent.getStringExtra("invite")!!
+            Logger.i("invite: $groupId")
+            navController.navigate(AppScreens.InviteScreen.route + "/$groupId"){
+                popUpTo(0)
+            }
+        } else if (!intent.getStringExtra("group_id").isNullOrBlank()){
             val groupId = intent.getStringExtra("group_id")!!
             Logger.i(groupId)
             navController.navigate(AppScreens.TimetableScreen.route + "/$groupId"){
                 popUpTo(0)
             }
         } else {
-            navController.navigate(AppScreens.TimetableScreen.route + "/0"){
-                popUpTo(0)
+            loginViewModel.loadUserGroups{ groupId ->
+                navController.navigate(AppScreens.TimetableScreen.route + "/$groupId}"){
+                    popUpTo(0)
+                }
             }
+
         }
+
     }
     LaunchedEffect("login_test") {
         loginViewModel.testAuth(context){
@@ -69,7 +79,7 @@ fun LoginScreen (
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
-    var scrollState = rememberScrollState()
+    val scrollState = rememberScrollState()
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier

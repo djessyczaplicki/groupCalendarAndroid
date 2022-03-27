@@ -70,5 +70,11 @@
     <string name="remove_user">Remove user</string>
     <string name="make_admin">Make Admin</string>
     <string name="dismiss_as_admin">Dismiss as admin</string>
+    <string name="share_group_invite">Share group invite</string>
+    <string name="invite_screen">Invitation to</string>
+    <string name="invite_text">You have been invited to the group \"{0}\". Would you like to join it ?</string>
+    <string name="join_group">Join</string>
+    <string name="invite_base_url" translatable="false">https://groupcalendar.djessyczaplicki.com</string>
+    <string name="user_already_in_group">You are already a member of this group!</string>
 
 </resources>

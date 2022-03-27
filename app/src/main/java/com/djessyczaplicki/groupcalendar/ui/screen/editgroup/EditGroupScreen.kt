@@ -1,4 +1,4 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen
+package com.djessyczaplicki.groupcalendar.ui.screen.editgroup
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -195,6 +193,13 @@ fun EditGroupScreen(
                         }
                     }) {
                     Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                }
+                Button(
+                    onClick = {
+                        editGroupViewModel.sendInviteLink(context);
+                    }
+                ) {
+                    Text("Invite")
                 }
             }
         }

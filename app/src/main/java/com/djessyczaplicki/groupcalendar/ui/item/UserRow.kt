@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.util.fullName
 
 @Composable

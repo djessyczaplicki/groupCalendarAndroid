@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
+import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -18,6 +19,8 @@ class LoginViewModel : ViewModel() {
     private val isLoading = mutableStateOf(false)
     private val loadError = mutableStateOf("")
     private lateinit var auth: FirebaseAuth
+
+    private val getUserByIdUseCase = GetUserByIdUseCase()
 
     fun isLoading(): MutableState<Boolean> = isLoading
     fun loadError() : MutableState<String> = loadError
@@ -59,6 +62,15 @@ class LoginViewModel : ViewModel() {
                     onSuccessCallback()
                 }
             }
+        }
+    }
+
+    fun loadUserGroups(onSuccessCallback: (groupId: String) -> Unit) {
+        viewModelScope.launch{
+            val userId = Firebase.auth.currentUser!!.uid
+            val user = getUserByIdUseCase(userId)
+            val groupId = user.groups[0]
+            onSuccessCallback(groupId)
         }
     }
 }

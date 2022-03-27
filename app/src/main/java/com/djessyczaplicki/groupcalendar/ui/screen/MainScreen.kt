@@ -11,10 +11,12 @@ import androidx.navigation.navArgument
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupScreen
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen.EditGroupViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupScreen
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteScreen
+import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableScreen
@@ -28,6 +30,7 @@ fun MainScreen(
     eventViewModel: EventViewModel,
     editEventViewModel: EditEventViewModel,
     editGroupViewModel: EditGroupViewModel,
+    inviteViewModel: InviteViewModel,
     intent: Intent
 ) {
 
@@ -119,6 +122,18 @@ fun MainScreen(
                 editGroupViewModel.isEditing.value = false
 
                 EditGroupScreen(navController, editGroupViewModel)
+            }
+            composable(
+                AppScreens.InviteScreen.route + AppScreensVariables.GroupId.variable,
+                arguments = listOf(
+                    navArgument("group_id") { type = NavType.StringType }
+                )
+            ) {
+                val groupId = it.arguments?.getString("group_id")!!
+                inviteViewModel.groupId.value = groupId
+                inviteViewModel.load()
+
+                InviteScreen(navController, inviteViewModel)
             }
         }
     }

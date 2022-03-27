@@ -134,7 +134,7 @@ fun TimetablePage(
     val events = timetableViewModel.events.value
     val eventsOfTheWeek = events.filter { event ->
         event.start.isAfter(firstDateOfWeek.atStartOfDay())
-        && event.end.isBefore(lastDateOfWeek.plusDays(1L).atStartOfDay())
+        && event.end.isBefore(lastDateOfWeek.atStartOfDay())
     }
     Column(
         Modifier

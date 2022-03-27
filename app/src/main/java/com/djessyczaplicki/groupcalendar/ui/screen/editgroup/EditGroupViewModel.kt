@@ -1,5 +1,7 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.editgroupscreen
+package com.djessyczaplicki.groupcalendar.ui.screen.editgroup
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +15,12 @@ import com.djessyczaplicki.groupcalendar.domain.groupusecase.StoreGroupImageUseC
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.UpdateGroupUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
+import com.djessyczaplicki.groupcalendar.util.DynamicLinksUtil
+import com.djessyczaplicki.groupcalendar.R
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+
 
 class EditGroupViewModel : ViewModel() {
     var groupId: String? = null
@@ -67,6 +72,7 @@ class EditGroupViewModel : ViewModel() {
     private fun updateGroup(group: Group, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             updateGroupUseCase(group)
+            // add the group to creator/editor's groups
             val uid = Firebase.auth.currentUser!!.uid
             val user = getUserByIdUseCase(uid)
             if (!user.groups.contains(group.id)) {
@@ -101,13 +107,29 @@ class EditGroupViewModel : ViewModel() {
         viewModelScope.launch {
             if (!group.value.users.contains(user.id)) return@launch
 
-            val users = group.value.users.filterNot { it == user.id }
+            val groupUsers = group.value.users.filterNot { it == user.id }
             val admins = group.value.users.filterNot { it == user.id }
-            group.value.users = users
+            group.value.users = groupUsers
             group.value.admins = admins
             group.value = updateGroupUseCase(group.value)
+
+            val groups = user.groups.filterNot { it == groupId }
+            user.groups = groups
+            updateUserUseCase(user)
             loadUsers()
         }
     }
+
+    fun sendInviteLink(context: Context) {
+        var link = context.getString(R.string.invite_base_url)
+        link += "/invite/${groupId}"
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, link)
+
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_group_invite)))
+    }
+
+
 
 }
