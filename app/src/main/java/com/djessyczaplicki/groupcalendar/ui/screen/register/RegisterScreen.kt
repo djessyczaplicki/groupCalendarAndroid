@@ -1,6 +1,5 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.login
 
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,8 +12,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,50 +35,27 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
-import com.orhanobut.logger.Logger
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen (
+fun RegisterScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel,
-    intent: Intent
+    registerViewModel: RegisterViewModel
 ) {
     val context = LocalContext.current
 
-    fun success() {
-        if (!intent.getStringExtra("invite").isNullOrBlank()) {
-            val groupId = intent.getStringExtra("invite")!!
-            Logger.i("invite: $groupId")
-            navController.navigate(AppScreens.InviteScreen.route + "/$groupId"){
-                popUpTo(0)
-            }
-        } else if (!intent.getStringExtra("group_id").isNullOrBlank()){
-            val groupId = intent.getStringExtra("group_id")!!
-            Logger.i(groupId)
-            navController.navigate(AppScreens.TimetableScreen.route + "/$groupId"){
-                popUpTo(0)
-            }
-        } else {
-            loginViewModel.loadUserGroups{ groupId ->
-                navController.navigate(AppScreens.TimetableScreen.route + "/$groupId}"){
-                    popUpTo(0)
-                }
-            }
-
-        }
-
-    }
-    LaunchedEffect("login_test") {
-        loginViewModel.testAuth(context){
-            success()
-        }
-    }
-
-    var email by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var surname by rememberSaveable { mutableStateOf("") }
+    var age by rememberSaveable { mutableStateOf("") }
+
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    var confirmPasswordVisibility by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     Surface(
         color = MaterialTheme.colors.background,
@@ -84,7 +63,7 @@ fun LoginScreen (
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        Column (
+        Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = CenterHorizontally
@@ -93,7 +72,7 @@ fun LoginScreen (
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .height(100.dp)
                     .align(CenterHorizontally)
                     .background(Color.White)
             ) {
@@ -102,7 +81,7 @@ fun LoginScreen (
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
-                if (loginViewModel.isLoading().value)
+                if (registerViewModel.isLoading().value)
                     CircularProgressIndicator(
                         modifier = Modifier
                             .width(50.dp)
@@ -114,18 +93,54 @@ fun LoginScreen (
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            LoginTextField(
+            RegisterTextField(
                 value = email,
+                label = stringResource(R.string.email),
+                required = true,
                 onValueChange = { email = it },
-                label = stringResource(R.string.email)
+                keyboardType = KeyboardType.Email
             )
             Spacer(modifier = Modifier.height(20.dp))
-            LoginPasswordTextField(
+            PasswordTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = stringResource(R.string.password),
                 passwordVisibility = passwordVisibility,
                 onVisibilityChanged = { passwordVisibility = !passwordVisibility }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            PasswordTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = stringResource(R.string.confirm_password),
+                passwordVisibility = confirmPasswordVisibility,
+                onVisibilityChanged = { confirmPasswordVisibility = !confirmPasswordVisibility }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            RegisterTextField(
+                value = username,
+                label = stringResource(R.string.username),
+                required = true,
+                onValueChange = { username = it }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            RegisterTextField(
+                value = name,
+                label = stringResource(R.string.name),
+                onValueChange = { name = it }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            RegisterTextField(
+                value = surname,
+                label = stringResource(R.string.surname),
+                onValueChange = { surname = it }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            RegisterTextField(
+                value = age,
+                label = stringResource(R.string.age),
+                onValueChange = { age = it },
+                keyboardType = KeyboardType.Number
             )
             Spacer(modifier = Modifier.height(40.dp))
             Button(
@@ -133,12 +148,13 @@ fun LoginScreen (
                     .height(50.dp)
                     .width(200.dp),
                 onClick = {
-                    loginViewModel.login(
-                        email,
-                        password,
-                        context,
+                    registerViewModel.register(
+                        user = User(name = name, surname = surname, age = age.toIntOrNull(), email = email, username = username),
+                        password = password,
+                        confirmPassword = confirmPassword,
+                        context = context,
                         onSuccessCallback = {
-                            success()
+                            navController.navigate(AppScreens.TimetableScreen.route)
                         },
                         onFailureCallback = {
                             Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
@@ -146,25 +162,9 @@ fun LoginScreen (
                     )
                 }
             ) {
-                Text(text = stringResource(id = R.string.login))
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text(stringResource(R.string.or))
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Button(
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(200.dp),
-                onClick = {
-                    navController.navigate(AppScreens.RegisterScreen.route)
-                }
-            ) {
                 Text(text = stringResource(id = R.string.register))
             }
-            Spacer(modifier = Modifier.height(40.dp))
-
+            Spacer(modifier = Modifier.height(100.dp))
         }
 
 
@@ -173,12 +173,17 @@ fun LoginScreen (
 }
 
 @Composable
-fun LoginTextField(
+fun RegisterTextField(
     value: String,
     label: String,
+    required: Boolean = false,
     onValueChange: (value: String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Email
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
+    var text = label
+    if (required) {
+        text += "*"
+    }
     TextField(
         shape = AbsoluteRoundedCornerShape(10.dp, 10.dp),
         singleLine = true,
@@ -188,18 +193,19 @@ fun LoginTextField(
             keyboardType = keyboardType,
             imeAction = ImeAction.Next
         ),
-        label = { Text(label) },
+        label = { Text(text) },
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = colorResource(id = R.color.text_field_bg)
         )
     )
 }
 
+
 @Composable
-fun LoginPasswordTextField(
+fun PasswordTextField(
     value: String,
     label: String,
-    required: Boolean = false,
+    required: Boolean = true,
     onValueChange: (value: String) -> Unit,
     passwordVisibility: Boolean,
     onVisibilityChanged: () -> Unit
@@ -217,7 +223,7 @@ fun LoginPasswordTextField(
         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Go
+            imeAction = ImeAction.Next
         ),
         trailingIcon = {
             val image = if (passwordVisibility)
@@ -234,14 +240,14 @@ fun LoginPasswordTextField(
     )
 }
 
+
 @Preview(showBackground = true)
 @Composable
-fun PreviewLoginScreen() {
+fun PreviewRegisterScreen() {
     MaterialTheme {
-        LoginScreen(
+        RegisterScreen(
             navController = rememberNavController(),
-            loginViewModel = LoginViewModel(),
-            intent = Intent()
+            registerViewModel = RegisterViewModel()
         )
     }
 }

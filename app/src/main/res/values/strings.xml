@@ -76,5 +76,19 @@
     <string name="join_group">Join</string>
     <string name="invite_base_url" translatable="false">https://groupcalendar.djessyczaplicki.com</string>
     <string name="user_already_in_group">You are already a member of this group!</string>
+    <string name="confirm_attendance">Confirm attendance:</string>
+    <string name="confirmed_users">Confirmed users</string>
+    <string name="you">(You)</string>
+    <string name="or">Or</string>
+    <string name="register">Register</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="surname">Surname</string>
+    <string name="age">Age</string>
+    <string name="passwords_dont_match">Passwords don\'t match!</string>
+    <string name="password_must_be_6_or_greater">The password must be 6 characters long or greater!</string>
+    <string name="email_empty">Please enter the email.</string>
+    <string name="wrong_age">You can\'t be older than 99 years.</string>
+    <string name="username_length_exception">Your username must be longer than 6 characters and shorter than 20 characters!</string>
 
 </resources>

@@ -16,7 +16,7 @@
     <string name="friday_short">Vie.</string>
     <string name="saturday_short">Sáb.</string>
     <string name="sunday_short">Dom.</string>
-    <string name="username">Nombre de usuario:</string>
+    <string name="username">Nombre de usuario</string>
     <string name="email">Correo</string>
     <string name="wrong_credentials">Combinación usuario contraseña erronea</string>
     <string name="login">Conectarse</string>
@@ -75,4 +75,19 @@
     <string name="invite_text">Has sido invitado al grupo \"{0}\". ¿Quieres unirte?</string>
     <string name="join_group">Unirse a</string>
     <string name="user_already_in_group">¡Ya eres miembro de este grupo!</string>
+    <string name="confirm_attendance">Confirmar asistencia:</string>
+    <string name="confirmed_users">Usuarios confirmados</string>
+    <string name="you">(Tú)</string>
+    <string name="or">O</string>
+    <string name="register">Registrarse</string>
+    <string name="disconnect">Desconectarse</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="surname">Apellidos</string>
+    <string name="age">Edad</string>
+    <string name="passwords_dont_match">¡Las contraseñas son diferentes!</string>
+    <string name="password_must_be_6_or_greater">¡La contraseña tiene que ser de al menos 6 caracteres!</string>
+    <string name="email_empty">Por favor, introduzca el correo.</string>
+    <string name="wrong_age">No puede ser mayor de 99 años.</string>
+    <string name="username_length_exception">¡Su nombre de usuario tiene que ser de al menos 6 caracteres, y menor de 20 caracteres!</string>
+
 </resources>

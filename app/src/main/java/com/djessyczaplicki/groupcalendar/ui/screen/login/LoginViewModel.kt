@@ -69,7 +69,11 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch{
             val userId = Firebase.auth.currentUser!!.uid
             val user = getUserByIdUseCase(userId)
-            val groupId = user.groups[0]
+            val groupId = if (user.groups.isNotEmpty()) {
+                user.groups[0]
+            } else {
+                "0"
+            }
             onSuccessCallback(groupId)
         }
     }

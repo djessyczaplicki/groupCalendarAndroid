@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -58,6 +59,7 @@ fun GroupRow(
             Text(
                 text = group.name,
                 fontWeight = FontWeight.SemiBold,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
             )
         }
