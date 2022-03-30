@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.orhanobut.logger.Logger
 import java.io.ByteArrayOutputStream
 
 class StoreGroupImageUseCase {

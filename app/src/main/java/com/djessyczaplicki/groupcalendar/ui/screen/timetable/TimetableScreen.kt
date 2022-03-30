@@ -37,6 +37,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import java.lang.Integer.max
+import java.lang.Integer.min
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -50,16 +51,23 @@ fun TimetableScreen(
     navController: NavController,
     timetableViewModel: TimetableViewModel
 ) {
+    val numberOfPages = 1000
+    val startPage = numberOfPages / 2
+    val daysToShow = 7L
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val groups = timetableViewModel.groups
     var gesturesEnabled by remember { mutableStateOf(false) }
+    var isDailyViewEnabled by rememberSaveable { mutableStateOf(false) }
+    var page by rememberSaveable { mutableStateOf(startPage) }
+    val pagerState = rememberPagerState()
     ModalDrawer(
         drawerState = drawerState,
         gesturesEnabled = gesturesEnabled,
         drawerContent = {
             DrawerContent(
-                groups = groups.value
+                groups = groups.value,
+                navController = navController
             ) { route ->
                 scope.launch {
                     gesturesEnabled = false
@@ -77,10 +85,29 @@ fun TimetableScreen(
             topBar = {
                 val resources = LocalContext.current.resources
                 val shownGroups = timetableViewModel.shownGroups.value
+                val scope = rememberCoroutineScope()
                 val groupNames = shownGroups.joinToString { it.name }
                 TopBar(
                     title = resources.getQuantityString(R.plurals.timetable_title, shownGroups.size) + ": $groupNames",
                     navController = navController,
+                    isDailyViewEnabled = isDailyViewEnabled,
+                    onIconClicked = {
+                        isDailyViewEnabled = !isDailyViewEnabled
+                        scope.launch{
+                            // this method is used in order to compensate the gap between moving pages by days and by week,
+                            // so when we swap from days to week or vice versa, the number of the actual page adapts
+                            // ex isDailyViewEnabled = true:
+                            //      we are at page 502/1000, with startPage = 500 -> 502 - 500 = 2; 2 * 7 = 14; 14 + 500 = 514
+                            // ex isDailyViewEnabled = false:
+                            //      we are at page 490/1000, with startPage = 500 -> 486 - 500 = -14; -14 / 7 = -2; -2 + 500 = 498
+                            pagerState.scrollToPage(
+                                if (isDailyViewEnabled)
+                                    max(min(((page - startPage) * daysToShow.toInt()) + startPage, numberOfPages), 0)
+                                else
+                                    ((page - startPage).floorDiv(daysToShow.toInt())) + startPage
+                            )
+                        }
+                    },
                     onButtonClicked = {
                         scope.launch {
                             gesturesEnabled = true
@@ -90,23 +117,22 @@ fun TimetableScreen(
                 )
             },
             content = {
-                var page by rememberSaveable{ mutableStateOf(100) }
-                val pagerState = rememberPagerState()
                 val scrollState = rememberScrollState()
                 val heightPx = with(LocalDensity.current) { 64.dp.roundToPx()}
-                LaunchedEffect(Unit) { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
+                LaunchedEffect("key") { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
 
-                HorizontalPager(count = 200, state = pagerState ) { pageNum ->
+                HorizontalPager(count = numberOfPages, state = pagerState ) { pageNum ->
                     TimetablePage(
                         navController = navController,
                         timetableViewModel = timetableViewModel,
-                        weeksToAdd = pageNum - 100,
-                        scrollState = scrollState
+                        page = pageNum - startPage,
+                        scrollState = scrollState,
+                        daysToShow = if (isDailyViewEnabled) 1 else daysToShow
                     )
                     page = pagerState.currentPage
                 }
                 LaunchedEffect("key1") {
-                    pagerState.scrollToPage(if (page == 0) 100 else page)
+                    pagerState.scrollToPage(if (page == 0) startPage else page)
                 }
             },
             floatingActionButton =  {
@@ -121,16 +147,17 @@ fun TimetableScreen(
 fun TimetablePage(
     navController: NavController,
     timetableViewModel: TimetableViewModel,
-    weeksToAdd: Int,
-    scrollState: ScrollState
+    page: Int,
+    scrollState: ScrollState,
+    daysToShow: Long = 7L
 ) {
-    val day = LocalDate.now().plusWeeks(weeksToAdd.toLong())
+    val day = LocalDate.now().plusDays(page * daysToShow)
     // https://stackoverflow.com/questions/28450720/get-date-of-first-day-of-week-based-on-localdate-now-in-java-8
     val dayOfWeek = DayOfWeek.MONDAY
     val firstDateOfWeek by rememberSaveable {
-        mutableStateOf(day.with(dayOfWeek))
+        mutableStateOf(if (daysToShow == 7L) day.with(dayOfWeek) else day)
     }
-    val lastDateOfWeek = firstDateOfWeek.plusDays(7)
+    val lastDateOfWeek = firstDateOfWeek.plusDays(daysToShow)
     val events = timetableViewModel.events.value
     val eventsOfTheWeek = events.filter { event ->
         event.start.isAfter(firstDateOfWeek.atStartOfDay())
@@ -254,7 +281,6 @@ fun BasicSchedule(
             }
     ) { measurables, constraints ->
         val height = hourHeight.roundToPx() * 24
-//        val dayWidth = (constraints.maxWidth.toDp() / 7)
         val width = dayWidth.roundToPx() * numDays
         val placeablesWithEvents = measurables.map { measurable ->
             val event = measurable.parentData as Event

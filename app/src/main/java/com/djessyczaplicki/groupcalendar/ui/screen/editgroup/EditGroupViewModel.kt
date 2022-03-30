@@ -15,8 +15,8 @@ import com.djessyczaplicki.groupcalendar.domain.groupusecase.StoreGroupImageUseC
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.UpdateGroupUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
-import com.djessyczaplicki.groupcalendar.util.DynamicLinksUtil
 import com.djessyczaplicki.groupcalendar.R
+import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUsersUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -29,6 +29,7 @@ class EditGroupViewModel : ViewModel() {
     val getGroupByIdUseCase = GetGroupByIdUseCase()
     val updateGroupUseCase = UpdateGroupUseCase()
     val getUserByIdUseCase = GetUserByIdUseCase()
+    val getUsersUseCase = GetUsersUseCase()
     val updateUserUseCase = UpdateUserUseCase()
     val storeGroupImageUseCase = StoreGroupImageUseCase()
 
@@ -46,10 +47,7 @@ class EditGroupViewModel : ViewModel() {
 
     fun loadUsers() {
         viewModelScope.launch {
-            users.value = mutableListOf()
-            group.value.users.forEach { userId ->
-                users.value += getUserByIdUseCase(userId)
-            }
+            users.value = getUsersUseCase(group.value.users)
         }
     }
 

@@ -3,6 +3,7 @@ package com.djessyczaplicki.groupcalendar.data.remote.model
 data class User(
     var id: String = "0",
     var username: String = "user",
+    var email: String = "user@example.com",
     var name: String = "Name",
     var surname: String = "Surname",
     var age: Int? = null,

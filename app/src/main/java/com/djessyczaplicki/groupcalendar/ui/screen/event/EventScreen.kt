@@ -1,18 +1,14 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.event
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Textsms
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.CollapsingTopBar
+import com.djessyczaplicki.groupcalendar.ui.item.EventUserRow
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.util.formatMinute
 import com.djessyczaplicki.groupcalendar.util.formatted
@@ -144,6 +141,43 @@ fun EventScreenContent(
             StartHour(event = event, modifier = Modifier.weight(1f))
             EndHour(event = event, modifier = Modifier.weight(1f))
         }
+
+        Divider(thickness = 1.dp)
+
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Text(stringResource(id = R.string.confirm_attendance), Modifier.padding(8.dp))
+            IconButton(onClick = {
+                eventViewModel.confirmAttendance()
+            }) {
+                Icon(Icons.Filled.TaskAlt, "accept", Modifier.padding(8.dp))
+            }
+            IconButton(onClick = {
+                eventViewModel.denyAttendance()
+            }) {
+                Icon(Icons.Filled.DoNotDisturb, "deny", Modifier.padding(8.dp))
+            }
+        }
+
+        val confirmedUsers = eventViewModel.confirmedUsers.value
+
+        Text(stringResource(id = R.string.confirmed_users) + " (${confirmedUsers.size}):", Modifier.padding(8.dp))
+
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+        ) {
+            items(confirmedUsers) { user ->
+                EventUserRow(user)
+            }
+        }
+
 
     }
 }

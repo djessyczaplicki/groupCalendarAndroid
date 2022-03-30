@@ -12,6 +12,7 @@ import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.login.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
     private val editEventViewModel: EditEventViewModel by viewModels()
     private val editGroupViewModel: EditGroupViewModel by viewModels()
     private val inviteViewModel: InviteViewModel by viewModels()
+    private val registerViewModel: RegisterViewModel by viewModels()
     private val storage = Firebase.storage
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
                 editEventViewModel,
                 editGroupViewModel,
                 inviteViewModel,
+                registerViewModel,
                 intent
             )
         }

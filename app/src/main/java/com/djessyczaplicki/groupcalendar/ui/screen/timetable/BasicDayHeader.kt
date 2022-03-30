@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -16,7 +15,7 @@ import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-private val DayFormatter = DateTimeFormatter.ofPattern("EE, d MMMM")
+private val DayFormatter = DateTimeFormatter.ofPattern("EE, d MMM yy")
 
 @Composable
 fun BasicDayHeader(

@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -33,8 +34,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.orhanobut.logger.Logger
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -45,7 +44,6 @@ fun LoginScreen (
     intent: Intent
 ) {
     val context = LocalContext.current
-    val auth = Firebase.auth
 
     fun success() {
         if (!intent.getStringExtra("invite").isNullOrBlank()) {
@@ -76,7 +74,7 @@ fun LoginScreen (
         }
     }
 
-    var username by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -116,38 +114,18 @@ fun LoginScreen (
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            TextField(
-                shape = AbsoluteRoundedCornerShape(10.dp, 10.dp),
-                singleLine = true,
-                value = username,
-                onValueChange = { username = it },
-                label = { Text(stringResource(R.string.email)) },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = colorResource(id = R.color.text_field_bg)
-                )
+            LoginTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = stringResource(R.string.email)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            TextField(
-                shape = AbsoluteRoundedCornerShape(10.dp, 10.dp),
+            LoginPasswordTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(stringResource(R.string.password)) },
-                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    val image = if (passwordVisibility)
-                        Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
-
-                    IconButton(onClick = {
-                        passwordVisibility = !passwordVisibility
-                    }) {
-                        Icon(imageVector = image, "")
-                    }
-                },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = colorResource(id = R.color.text_field_bg)
-                )
+                label = stringResource(R.string.password),
+                passwordVisibility = passwordVisibility,
+                onVisibilityChanged = { passwordVisibility = !passwordVisibility }
             )
             Spacer(modifier = Modifier.height(40.dp))
             Button(
@@ -156,7 +134,7 @@ fun LoginScreen (
                     .width(200.dp),
                 onClick = {
                     loginViewModel.login(
-                        username,
+                        email,
                         password,
                         context,
                         onSuccessCallback = {
@@ -170,12 +148,90 @@ fun LoginScreen (
             ) {
                 Text(text = stringResource(id = R.string.login))
             }
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(stringResource(R.string.or))
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(200.dp),
+                onClick = {
+                    navController.navigate(AppScreens.RegisterScreen.route)
+                }
+            ) {
+                Text(text = stringResource(id = R.string.register))
+            }
+            Spacer(modifier = Modifier.height(40.dp))
+
         }
 
 
     }
 
+}
+
+@Composable
+fun LoginTextField(
+    value: String,
+    label: String,
+    onValueChange: (value: String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Email
+) {
+    TextField(
+        shape = AbsoluteRoundedCornerShape(10.dp, 10.dp),
+        singleLine = true,
+        value = value,
+        onValueChange = { onValueChange(it) },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = ImeAction.Next
+        ),
+        label = { Text(label) },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = colorResource(id = R.color.text_field_bg)
+        )
+    )
+}
+
+@Composable
+fun LoginPasswordTextField(
+    value: String,
+    label: String,
+    required: Boolean = false,
+    onValueChange: (value: String) -> Unit,
+    passwordVisibility: Boolean,
+    onVisibilityChanged: () -> Unit
+) {
+    var text = label
+    if (required) {
+        text += "*"
+    }
+    TextField(
+        shape = AbsoluteRoundedCornerShape(10.dp, 10.dp),
+        value = value,
+        onValueChange = { onValueChange(it) },
+        label = { Text(text) },
+        singleLine = true,
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Go
+        ),
+        trailingIcon = {
+            val image = if (passwordVisibility)
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
+
+            IconButton(onClick = { onVisibilityChanged() }) {
+                Icon(imageVector = image, "")
+            }
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = colorResource(id = R.color.text_field_bg)
+        )
+    )
 }
 
 @Preview(showBackground = true)

@@ -7,14 +7,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -122,7 +121,7 @@ fun CollapsingTopBar(
                     .layoutId(EDIT_ID)
                     .clickable { onEdit() }
                     .padding(12.dp),
-                imageVector = Icons.Filled.Edit,
+                imageVector = Icons.Filled.EditCalendar,
                 tint = MaterialTheme.colors.onPrimary,
                 contentDescription = "edit"
             )

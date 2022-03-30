@@ -136,10 +136,12 @@ fun EditGroupScreen(
                 .padding(4.dp)
         )
 
-        Text(
-            text = stringResource(id = R.string.members),
-            modifier = Modifier.padding(10.dp)
-        )
+        if (editGroupViewModel.users.value.isNotEmpty()) {
+            Text(
+                text = stringResource(id = R.string.members),
+                modifier = Modifier.padding(10.dp)
+            )
+        }
 
         LazyColumn(
             Modifier
@@ -194,12 +196,14 @@ fun EditGroupScreen(
                     }) {
                     Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
                 }
-                Button(
-                    onClick = {
-                        editGroupViewModel.sendInviteLink(context);
+                if (isEditing) {
+                    Button(
+                        onClick = {
+                            editGroupViewModel.sendInviteLink(context);
+                        }
+                    ) {
+                        Text("Invite")
                     }
-                ) {
-                    Text("Invite")
                 }
             }
         }

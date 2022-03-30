@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,7 +16,7 @@ import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
-import com.djessyczaplicki.groupcalendar.util.fullName
+import com.djessyczaplicki.groupcalendar.util.fullNameYou
 
 @Composable
 fun GroupUserRow(
@@ -32,8 +33,9 @@ fun GroupUserRow(
             .height(50.dp)
             .padding(horizontal = 15.dp, vertical = 8.dp)
     ){
+        val context = LocalContext.current
         Text(
-            text = user.fullName(),
+            text = user.fullNameYou(user.id, context),
             fontWeight = FontWeight.SemiBold
         )
 
@@ -81,6 +83,6 @@ fun GroupUserRow(
 
 @Composable
 @Preview(showBackground = true)
-fun UserRowPreview() {
+fun GroupUserRowPreview() {
     GroupUserRow(user = User(name = "djessy", surname = "czaplicki"), group = Group(), EditGroupViewModel())
 }
