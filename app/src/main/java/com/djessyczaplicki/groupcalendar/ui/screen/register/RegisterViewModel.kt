@@ -1,4 +1,4 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.login
+package com.djessyczaplicki.groupcalendar.ui.screen.register
 
 import android.content.Context
 import android.util.Log
@@ -7,21 +7,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.R
-import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
+import com.djessyczaplicki.groupcalendar.core.AuthenticationInterceptor
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val updateUserUseCase : UpdateUserUseCase,
+    private val interceptor: AuthenticationInterceptor
+) : ViewModel() {
     private val TAG = "LoginViewModel"
     private val isLoading = mutableStateOf(false)
     private val loadError = mutableStateOf("")
     private var auth = Firebase.auth
 
-    private val updateUserUseCase = UpdateUserUseCase()
 
     fun isLoading(): MutableState<Boolean> = isLoading
     fun loadError() : MutableState<String> = loadError
@@ -44,7 +49,7 @@ class RegisterViewModel : ViewModel() {
                         viewModelScope.launch {
                             Log.i(TAG, auth.currentUser!!.uid)
                             UserPreferences(context).saveAuthToken(token?:"")
-                            RetrofitHelper.setToken(token?:"")
+                            interceptor.setSessionToken(token ?: "")
                             user.id = auth.currentUser!!.uid
                             updateUserUseCase(user)
                             onSuccessCallback()

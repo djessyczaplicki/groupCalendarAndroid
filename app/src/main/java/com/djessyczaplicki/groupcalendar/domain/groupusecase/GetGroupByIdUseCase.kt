@@ -1,9 +1,9 @@
 package com.djessyczaplicki.groupcalendar.domain.groupusecase
 
-import com.djessyczaplicki.groupcalendar.data.network.Service
+import com.djessyczaplicki.groupcalendar.data.network.Repository
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
+import javax.inject.Inject
 
-class GetGroupByIdUseCase {
-    private val api = Service()
-    suspend operator fun invoke(id: String): Group? = api.getGroupById(id)
+class GetGroupByIdUseCase @Inject constructor(private val repository: Repository) {
+    suspend operator fun invoke(id: String): Group? = repository.getGroupById(id)
 }

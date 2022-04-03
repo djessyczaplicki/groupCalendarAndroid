@@ -1,5 +1,6 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
+import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -130,6 +131,7 @@ fun TimetableScreen(
                         daysToShow = if (isDailyViewEnabled) 1 else daysToShow
                     )
                     page = pagerState.currentPage
+                    Log.d("HorizontalPager", page.toString())
                 }
                 LaunchedEffect("key1") {
                     pagerState.scrollToPage(if (page == 0) startPage else page)
@@ -151,12 +153,12 @@ fun TimetablePage(
     scrollState: ScrollState,
     daysToShow: Long = 7L
 ) {
+    Log.d("TimetablePage", "page: $page")
     val day = LocalDate.now().plusDays(page * daysToShow)
+    Log.d("TimetablePage", "day: $day")
     // https://stackoverflow.com/questions/28450720/get-date-of-first-day-of-week-based-on-localdate-now-in-java-8
     val dayOfWeek = DayOfWeek.MONDAY
-    val firstDateOfWeek by rememberSaveable {
-        mutableStateOf(if (daysToShow == 7L) day.with(dayOfWeek) else day)
-    }
+    val firstDateOfWeek = if (daysToShow == 7L) day.with(dayOfWeek) else day
     val lastDateOfWeek = firstDateOfWeek.plusDays(daysToShow)
     val events = timetableViewModel.events.value
     val eventsOfTheWeek = events.filter { event ->

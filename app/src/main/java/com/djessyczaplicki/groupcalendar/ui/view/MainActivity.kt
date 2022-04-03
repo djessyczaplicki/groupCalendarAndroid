@@ -12,17 +12,19 @@ import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
-import com.djessyczaplicki.groupcalendar.ui.screen.login.RegisterViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * @author Djessy Czaplicki
  */
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels()

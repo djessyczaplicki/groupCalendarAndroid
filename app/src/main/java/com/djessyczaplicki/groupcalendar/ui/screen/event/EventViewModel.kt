@@ -11,15 +11,20 @@ import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUsersUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EventViewModel : ViewModel() {
+@HiltViewModel
+class EventViewModel @Inject constructor(
+    private val getGroupByIdUseCase : GetGroupByIdUseCase,
+    private val updateGroupEventsUseCase : UpdateGroupEventsUseCase,
+    private val getUsersUseCase : GetUsersUseCase
+) : ViewModel() {
     private lateinit var groupId: String
     private lateinit var eventId: String
 
-    val getGroupByIdUseCase = GetGroupByIdUseCase()
-    val updateGroupEventsUseCase = UpdateGroupEventsUseCase()
-    val getUsersUseCase = GetUsersUseCase()
+
 
     var group = mutableStateOf(Group())
     var event = mutableStateOf(Event())

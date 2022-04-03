@@ -19,19 +19,20 @@ import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUsersUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class EditGroupViewModel : ViewModel() {
+@HiltViewModel
+class EditGroupViewModel @Inject constructor(
+    private val getGroupByIdUseCase: GetGroupByIdUseCase,
+    private val updateGroupUseCase: UpdateGroupUseCase,
+    private val getUsersUseCase: GetUsersUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val updateUserUseCase: UpdateUserUseCase,
+    private val storeGroupImageUseCase: StoreGroupImageUseCase
+) : ViewModel() {
     var groupId: String? = null
-
-    //    val createGroupUseCase = CreateGroupUseCase()
-    val getGroupByIdUseCase = GetGroupByIdUseCase()
-    val updateGroupUseCase = UpdateGroupUseCase()
-    val getUserByIdUseCase = GetUserByIdUseCase()
-    val getUsersUseCase = GetUsersUseCase()
-    val updateUserUseCase = UpdateUserUseCase()
-    val storeGroupImageUseCase = StoreGroupImageUseCase()
 
     val users = mutableStateOf(listOf<User>())
     val group = mutableStateOf(Group())
@@ -72,7 +73,7 @@ class EditGroupViewModel : ViewModel() {
             updateGroupUseCase(group)
             // add the group to creator/editor's groups
             val uid = Firebase.auth.currentUser!!.uid
-            val user = getUserByIdUseCase(uid)
+            val user = getUserByIdUseCase(uid) ?: throw Exception("User not found")
             if (!user.groups.contains(group.id)) {
                 user.groups += group.id
                 updateUserUseCase(user)

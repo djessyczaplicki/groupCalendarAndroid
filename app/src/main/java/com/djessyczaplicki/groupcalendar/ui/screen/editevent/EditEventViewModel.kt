@@ -7,14 +7,17 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.domain.eventusecase.UpdateGroupEventsUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EditEventViewModel : ViewModel() {
+@HiltViewModel
+class EditEventViewModel @Inject constructor(
+    private val updateGroupEventsUseCase: UpdateGroupEventsUseCase,
+    private val getGroupByIdUseCase: GetGroupByIdUseCase
+): ViewModel() {
     lateinit var groupId: String
     lateinit var eventId: String
-
-    val updateGroupEventsUseCase = UpdateGroupEventsUseCase()
-    val getGroupByIdUseCase = GetGroupByIdUseCase()
 
     val group = mutableStateOf(Group())
     val event = mutableStateOf(Event())

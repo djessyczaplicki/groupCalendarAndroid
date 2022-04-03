@@ -30,11 +30,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.orhanobut.logger.Logger
+import javax.inject.Inject
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -217,7 +219,7 @@ fun LoginPasswordTextField(
         visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Go
+            imeAction = ImeAction.Done
         ),
         trailingIcon = {
             val image = if (passwordVisibility)
@@ -240,7 +242,7 @@ fun PreviewLoginScreen() {
     MaterialTheme {
         LoginScreen(
             navController = rememberNavController(),
-            loginViewModel = LoginViewModel(),
+            loginViewModel = viewModel(),
             intent = Intent()
         )
     }

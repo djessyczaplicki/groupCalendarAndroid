@@ -1,11 +1,9 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.invite
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.djessyczaplicki.groupcalendar.data.local.exception.UserNotFoundException
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
@@ -14,24 +12,26 @@ import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class InviteViewModel : ViewModel() {
+@HiltViewModel
+class InviteViewModel @Inject constructor(
+    private val getGroupByIdUseCase : GetGroupByIdUseCase,
+    private val getUserByIdUseCase : GetUserByIdUseCase,
+    private val updateGroupUseCase : UpdateGroupUseCase,
+    private val updateUserUseCase : UpdateUserUseCase
+) : ViewModel() {
     val user = mutableStateOf(User())
     val group = mutableStateOf(Group())
     val groupId = mutableStateOf("")
-
-    val getGroupByIdUseCase = GetGroupByIdUseCase()
-    val getUserByIdUseCase = GetUserByIdUseCase()
-    val updateGroupUseCase = UpdateGroupUseCase()
-    val updateUserUseCase = UpdateUserUseCase()
-
 
     fun load() {
         viewModelScope.launch {
             val userId = Firebase.auth.currentUser!!.uid
             group.value = getGroupByIdUseCase(groupId.value) ?: return@launch
-            user.value = getUserByIdUseCase(userId)
+            user.value = getUserByIdUseCase(userId) ?: throw UserNotFoundException("User not found")
         }
     }
 

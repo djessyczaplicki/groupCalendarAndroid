@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
@@ -84,5 +85,5 @@ fun GroupUserRow(
 @Composable
 @Preview(showBackground = true)
 fun GroupUserRowPreview() {
-    GroupUserRow(user = User(name = "djessy", surname = "czaplicki"), group = Group(), EditGroupViewModel())
+    GroupUserRow(user = User(name = "djessy", surname = "czaplicki"), group = Group(), viewModel())
 }

@@ -20,8 +20,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
@@ -208,6 +211,15 @@ fun EditGroupScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditGroupScreenPreview() {
+    EditGroupScreen(
+        rememberNavController(),
+        viewModel()
+    )
 }
 
 //private val startForActivityGallery = rememberLauncherForActivityResult(

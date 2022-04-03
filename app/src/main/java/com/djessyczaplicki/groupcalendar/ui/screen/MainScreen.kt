@@ -19,8 +19,8 @@ import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
-import com.djessyczaplicki.groupcalendar.ui.screen.login.RegisterScreen
-import com.djessyczaplicki.groupcalendar.ui.screen.login.RegisterViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterScreen
+import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme

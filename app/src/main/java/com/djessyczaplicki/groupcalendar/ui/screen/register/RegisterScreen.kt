@@ -1,4 +1,4 @@
-package com.djessyczaplicki.groupcalendar.ui.screen.login
+package com.djessyczaplicki.groupcalendar.ui.screen.register
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
@@ -57,6 +59,32 @@ fun RegisterScreen(
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
     var confirmPasswordVisibility by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+
+    fun onRegister() {
+        registerViewModel.register(
+            user = User(
+                name = name,
+                surname = surname,
+                age = age.toIntOrNull(),
+                email = email,
+                username = username
+            ),
+            password = password,
+            confirmPassword = confirmPassword,
+            context = context,
+            onSuccessCallback = {
+                navController.navigate(AppScreens.TimetableScreen.route)
+            },
+            onFailureCallback = {
+                Toast.makeText(
+                    context,
+                    it ?: context.getText(R.string.wrong_credentials),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+    }
+
     Surface(
         color = MaterialTheme.colors.background,
         modifier = Modifier
@@ -140,7 +168,11 @@ fun RegisterScreen(
                 value = age,
                 label = stringResource(R.string.age),
                 onValueChange = { age = it },
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+                onDone = {
+                    onRegister()
+                }
             )
             Spacer(modifier = Modifier.height(40.dp))
             Button(
@@ -148,18 +180,7 @@ fun RegisterScreen(
                     .height(50.dp)
                     .width(200.dp),
                 onClick = {
-                    registerViewModel.register(
-                        user = User(name = name, surname = surname, age = age.toIntOrNull(), email = email, username = username),
-                        password = password,
-                        confirmPassword = confirmPassword,
-                        context = context,
-                        onSuccessCallback = {
-                            navController.navigate(AppScreens.TimetableScreen.route)
-                        },
-                        onFailureCallback = {
-                            Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
-                        }
-                    )
+                    onRegister()
                 }
             ) {
                 Text(text = stringResource(id = R.string.register))
@@ -172,13 +193,17 @@ fun RegisterScreen(
 
 }
 
+
+
 @Composable
 fun RegisterTextField(
     value: String,
     label: String,
     required: Boolean = false,
     onValueChange: (value: String) -> Unit,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    onDone: () -> Unit = { }
 ) {
     var text = label
     if (required) {
@@ -191,7 +216,10 @@ fun RegisterTextField(
         onValueChange = { onValueChange(it) },
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
-            imeAction = ImeAction.Next
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { onDone() }
         ),
         label = { Text(text) },
         colors = TextFieldDefaults.textFieldColors(
@@ -247,7 +275,7 @@ fun PreviewRegisterScreen() {
     MaterialTheme {
         RegisterScreen(
             navController = rememberNavController(),
-            registerViewModel = RegisterViewModel()
+            registerViewModel = viewModel()
         )
     }
 }

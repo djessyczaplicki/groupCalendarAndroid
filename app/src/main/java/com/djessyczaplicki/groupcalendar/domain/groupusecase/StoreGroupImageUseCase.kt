@@ -6,8 +6,9 @@ import android.util.Log
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
-class StoreGroupImageUseCase {
+class StoreGroupImageUseCase @Inject constructor() {
     operator fun invoke(groupId: String, groupImage: Bitmap, onSuccessCallback: (url: Uri) -> Unit) = storeGroupImage(groupId, groupImage, onSuccessCallback)
 }
 

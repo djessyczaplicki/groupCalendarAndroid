@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
@@ -155,12 +157,16 @@ fun EventScreenContent(
             IconButton(onClick = {
                 eventViewModel.confirmAttendance()
             }) {
-                Icon(Icons.Filled.TaskAlt, "accept", Modifier.padding(8.dp))
+                Card(elevation = 4.dp, shape = CircleShape) {
+                    Icon(Icons.Filled.TaskAlt, "accept", Modifier.padding(8.dp))
+                }
             }
             IconButton(onClick = {
                 eventViewModel.denyAttendance()
             }) {
-                Icon(Icons.Filled.DoNotDisturb, "deny", Modifier.padding(8.dp))
+                Card(elevation = 4.dp, shape = CircleShape) {
+                    Icon(Icons.Filled.DoNotDisturb, "deny", Modifier.padding(8.dp))
+                }
             }
         }
 
@@ -185,9 +191,7 @@ fun EventScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun EventScreenPreview() {
-    val vm = EventViewModel()
-    vm.event.value = Event(name = "Evento prueba", recurrenceId = "2", description = "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500,")
-    EventScreen(rememberNavController(), vm)
+    EventScreen(rememberNavController(), viewModel())
 }
 
 @Composable

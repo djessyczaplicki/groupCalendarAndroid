@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.djessyczaplicki.groupcalendar.R
-import com.djessyczaplicki.groupcalendar.core.RetrofitHelper
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
@@ -115,7 +114,8 @@ fun disconnect(context: Context, navController: NavController) {
     runBlocking{
         launch {
             UserPreferences(context).saveAuthToken("")
-            RetrofitHelper.setToken("")
+//            val interceptor = AuthenticationInterceptor()
+//            interceptor.setSessionToken("")
             Firebase.auth.signOut()
             navController.navigate(AppScreens.LoginScreen.route) {
                 popUpTo(0)
