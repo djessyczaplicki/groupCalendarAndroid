@@ -56,6 +56,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun testAuth(context: Context, onSuccessCallback: () -> Unit) {
+        isLoading.value = true
         if (auth.currentUser != null) {
             auth.getAccessToken(false).addOnCompleteListener {
                 viewModelScope.launch {
@@ -67,6 +68,7 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+        isLoading.value = false
     }
 
     fun loadUserGroups(onSuccessCallback: (groupId: String) -> Unit) {

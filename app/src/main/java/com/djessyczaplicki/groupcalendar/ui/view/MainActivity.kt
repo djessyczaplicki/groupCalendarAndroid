@@ -3,21 +3,22 @@ package com.djessyczaplicki.groupcalendar.ui.view
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -27,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val TAG = "MainActivity"
     private val loginViewModel: LoginViewModel by viewModels()
     private val timetableViewModel: TimetableViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
@@ -34,12 +36,13 @@ class MainActivity : ComponentActivity() {
     private val editGroupViewModel: EditGroupViewModel by viewModels()
     private val inviteViewModel: InviteViewModel by viewModels()
     private val registerViewModel: RegisterViewModel by viewModels()
-    private val storage = Firebase.storage
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        Logger.addLogAdapter(AndroidLogAdapter())
         handleIntent(intent)
+        handleCloudMessaging()
 
         setContent {
             MainScreen(
@@ -79,5 +82,17 @@ class MainActivity : ComponentActivity() {
 //                // https://developer.android.com/studio/write/app-link-indexing
 //            }
 //        }
+    }
+
+    private fun handleCloudMessaging() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val token = task.result
+            Log.d(TAG, "FirebaseMessaging token: $token")
+        }
     }
 }

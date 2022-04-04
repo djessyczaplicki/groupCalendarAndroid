@@ -53,11 +53,13 @@ class RegisterViewModel @Inject constructor(
                             user.id = auth.currentUser!!.uid
                             updateUserUseCase(user)
                             onSuccessCallback()
+                            isLoading.value = false
                         }
                     } else {
                         // If register fails, display a message to the user.
                         Log.w(TAG, "registerInWithEmailAndPassword:failure", task.exception)
                         onFailureCallback(task.exception?.message)
+                        isLoading.value = false
                     }
                 }
         }

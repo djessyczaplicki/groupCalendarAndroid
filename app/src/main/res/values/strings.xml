@@ -90,5 +90,6 @@
     <string name="email_empty">Please enter the email.</string>
     <string name="wrong_age">You can\'t be older than 99 years.</string>
     <string name="username_length_exception">Your username must be longer than 6 characters and shorter than 20 characters!</string>
+    <string name="default_notification_channel_id" translatable="false">groupcalendarchannel</string>
 
 </resources>

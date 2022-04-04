@@ -1,6 +1,7 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.login
 
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -35,8 +37,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
-import com.orhanobut.logger.Logger
-import javax.inject.Inject
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -45,18 +45,19 @@ fun LoginScreen (
     loginViewModel: LoginViewModel,
     intent: Intent
 ) {
+    val TAG = "LoginScreen"
     val context = LocalContext.current
 
     fun success() {
         if (!intent.getStringExtra("invite").isNullOrBlank()) {
             val groupId = intent.getStringExtra("invite")!!
-            Logger.i("invite: $groupId")
+            Log.d(TAG, "invite: $groupId")
             navController.navigate(AppScreens.InviteScreen.route + "/$groupId"){
                 popUpTo(0)
             }
         } else if (!intent.getStringExtra("group_id").isNullOrBlank()){
             val groupId = intent.getStringExtra("group_id")!!
-            Logger.i(groupId)
+            Log.d(TAG, groupId)
             navController.navigate(AppScreens.TimetableScreen.route + "/$groupId"){
                 popUpTo(0)
             }
@@ -66,9 +67,7 @@ fun LoginScreen (
                     popUpTo(0)
                 }
             }
-
         }
-
     }
     LaunchedEffect("login_test") {
         loginViewModel.testAuth(context){
@@ -91,20 +90,24 @@ fun LoginScreen (
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = CenterHorizontally
         ) {
+
             Spacer(modifier = Modifier.height(20.dp))
+            Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.h5, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(20.dp))
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .height(250.dp)
                     .align(CenterHorizontally)
                     .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = R.drawable.ic_calendar_icon),
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
-                if (loginViewModel.isLoading().value)
+                if (loginViewModel.isLoading().value) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .width(50.dp)
@@ -112,9 +115,10 @@ fun LoginScreen (
                             .padding(top = 30.dp),
                         strokeWidth = 5.dp
                     )
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
             LoginTextField(
                 value = email,

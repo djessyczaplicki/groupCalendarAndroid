@@ -100,12 +100,12 @@ fun RegisterScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(80.dp)
                     .align(CenterHorizontally)
                     .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = R.drawable.ic_calendar_icon),
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
