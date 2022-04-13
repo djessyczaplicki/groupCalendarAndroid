@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.item.GroupUserRow
+import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 
 @Composable
 fun EditGroupScreen(
@@ -69,147 +71,152 @@ fun EditGroupScreen(
         }
     }
 
-    Column(
-        Modifier.verticalScroll(rememberScrollState())
+    Surface(
+        color = Color.White
     ) {
+        Column(
+            Modifier.verticalScroll(rememberScrollState())
+        ) {
 
-        Text(
-            text = stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group),
-            modifier = Modifier
-                .height(30.dp)
-                .padding(4.dp),
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            if (imageBitmap != null) {
-                Image(
-                    imageBitmap!!.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clickable {
-                            launcher.launch("image/*")
-                        }
-                )
-                if (editGroupViewModel.isLoading)
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .width(50.dp)
-                            .padding(top = 30.dp),
-                        strokeWidth = 5.dp
-                    )
-            } else {
-                SubcomposeAsyncImage(
-                    model = image,
-                    loading = {
-                        CircularProgressIndicator()
-                    },
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clickable {
-                            launcher.launch("image/*")
-                        }
-                )
-            }
-        }
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text(stringResource(id = R.string.name)) },
-            placeholder = { Text(stringResource(id = R.string.group_name))},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(4.dp)
-        )
-        OutlinedTextField(
-            value = description ?: "",
-            onValueChange = { description = it },
-            label = { Text(stringResource(id = R.string.description)) },
-            placeholder = { Text(stringResource(id = R.string.group_description))},
-            singleLine = false,
-            modifier = Modifier
-                .height(120.dp)
-                .fillMaxWidth()
-                .padding(4.dp)
-        )
-
-        if (editGroupViewModel.users.value.isNotEmpty()) {
             Text(
-                text = stringResource(id = R.string.members),
-                modifier = Modifier.padding(10.dp)
+                text = stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group),
+                modifier = Modifier
+                    .height(30.dp)
+                    .padding(4.dp),
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
             )
-        }
-
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .requiredHeightIn(max = 300.dp)
-                .border(
-                    BorderStroke(1.dp, colorResource(id = R.color.lighter_grey)),
-                    shape = RectangleShape
-                )
-        ) {
-            items(editGroupViewModel.users.value) { user ->
-
-                Box {
-                    GroupUserRow(user, group, editGroupViewModel)
-
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                if (imageBitmap != null) {
+                    Image(
+                        imageBitmap!!.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clickable {
+                                launcher.launch("image/*")
+                            }
+                    )
+                    if (editGroupViewModel.isLoading)
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .width(50.dp)
+                                .padding(top = 30.dp),
+                            strokeWidth = 5.dp
+                        )
+                } else {
+                    SubcomposeAsyncImage(
+                        model = image,
+                        loading = {
+                            CircularProgressIndicator()
+                        },
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clickable {
+                                launcher.launch("image/*")
+                            }
+                    )
                 }
             }
-        }
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text(stringResource(id = R.string.name)) },
+                placeholder = { Text(stringResource(id = R.string.group_name))},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .padding(4.dp)
+            )
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(stringResource(id = R.string.description)) },
+                placeholder = { Text(stringResource(id = R.string.group_description))},
+                singleLine = false,
+                modifier = Modifier
+                    .height(120.dp)
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            )
 
+            if (editGroupViewModel.users.value.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.members),
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
 
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp)
+                    .requiredHeightIn(max = 300.dp)
+                    .border(
+                        BorderStroke(1.dp, colorResource(id = R.color.lighter_grey)),
+                        shape = RectangleShape
+                    )
+            ) {
+                items(editGroupViewModel.users.value) { user ->
 
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            if (name.isNotBlank()) {
-                Button(
-                    onClick = {
-                        if (editGroupViewModel.isLoading) return@Button
-                        if (isEditing) {
-                            val group = editGroupViewModel.group.value
-                            group.name = name
-                            group.description = description
-                            editGroupViewModel.editGroup(group, imageBitmap) {
-                                navController.popBackStack()
-                            }
-                        } else {
-                            val newGroup = Group(
-                                name = name,
-                                description = description
-                            )
-                            editGroupViewModel.editGroup(newGroup, imageBitmap) {
-                                //                             Doesn't work because the group isn't created yet when the app tries to load the view
-                                //                                navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
-                                //                                    popUpTo(0)
-                                //                                }
-                                navController.popBackStack()
-                            }
-                        }
-                    }) {
-                    Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                    Box {
+                        GroupUserRow(user, group, editGroupViewModel)
+
+                    }
                 }
-                if (isEditing) {
+            }
+
+
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                if (name.isNotBlank()) {
                     Button(
                         onClick = {
-                            editGroupViewModel.sendInviteLink(context);
+                            if (editGroupViewModel.isLoading) return@Button
+                            if (isEditing) {
+                                val group = editGroupViewModel.group.value
+                                group.name = name
+                                group.description = description
+                                editGroupViewModel.editGroup(group, imageBitmap) {
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                val newGroup = Group(
+                                    name = name,
+                                    description = description
+                                )
+                                editGroupViewModel.editGroup(newGroup, imageBitmap) {
+                                    //                             Doesn't work because the group isn't created yet when the app tries to load the view
+                                    navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
+                                        popUpTo(0)
+                                    }
+//                                    navController.popBackStack()
+                                }
+                            }
+                        }) {
+                        Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                    }
+                    if (isEditing) {
+                        Button(
+                            onClick = {
+                                editGroupViewModel.sendInviteLink(context);
+                            }
+                        ) {
+                            Text("Invite")
                         }
-                    ) {
-                        Text("Invite")
                     }
                 }
             }
         }
+
     }
 }
 

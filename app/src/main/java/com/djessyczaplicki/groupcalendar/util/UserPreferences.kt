@@ -17,6 +17,7 @@ class UserPreferences (
     val context: Context
 ){
     val TOKEN_AUTH = stringPreferencesKey("token_auth")
+    val FCM_TOKEN = stringPreferencesKey("fcm_token")
     private val applicationContext = context.applicationContext
 
     val authToken: Flow<String?> = context.dataStore.data.map { preferences ->
@@ -28,6 +29,14 @@ class UserPreferences (
             preferences[TOKEN_AUTH] = authToken
         }
     }
+
+    suspend fun saveFCMToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[FCM_TOKEN] = token
+        }
+    }
+
+
 
 
 }

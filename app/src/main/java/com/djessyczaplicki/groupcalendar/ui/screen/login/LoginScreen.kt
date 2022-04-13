@@ -37,6 +37,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -48,30 +50,10 @@ fun LoginScreen (
     val TAG = "LoginScreen"
     val context = LocalContext.current
 
-    fun success() {
-        if (!intent.getStringExtra("invite").isNullOrBlank()) {
-            val groupId = intent.getStringExtra("invite")!!
-            Log.d(TAG, "invite: $groupId")
-            navController.navigate(AppScreens.InviteScreen.route + "/$groupId"){
-                popUpTo(0)
-            }
-        } else if (!intent.getStringExtra("group_id").isNullOrBlank()){
-            val groupId = intent.getStringExtra("group_id")!!
-            Log.d(TAG, groupId)
-            navController.navigate(AppScreens.TimetableScreen.route + "/$groupId"){
-                popUpTo(0)
-            }
-        } else {
-            loginViewModel.loadUserGroups{ groupId ->
-                navController.navigate(AppScreens.TimetableScreen.route + "/$groupId}"){
-                    popUpTo(0)
-                }
-            }
-        }
-    }
+
     LaunchedEffect("login_test") {
         loginViewModel.testAuth(context){
-            success()
+            loginViewModel.success(intent, navController)
         }
     }
 
@@ -139,12 +121,16 @@ fun LoginScreen (
                     .height(50.dp)
                     .width(200.dp),
                 onClick = {
+                    if (email.isBlank() || password.isBlank()) {
+                        Toast.makeText(context, context.getString(R.string.error_email_password), Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                     loginViewModel.login(
                         email,
                         password,
                         context,
                         onSuccessCallback = {
-                            success()
+                            loginViewModel.success(intent, navController)
                         },
                         onFailureCallback = {
                             Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
@@ -153,6 +139,18 @@ fun LoginScreen (
                 }
             ) {
                 Text(text = stringResource(id = R.string.login))
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(200.dp),
+                onClick = {
+                    loginViewModel.loginWithGoogle(context)
+                }
+            ) {
+                Text(text = stringResource(id = R.string.login_with_google))
             }
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -172,8 +170,6 @@ fun LoginScreen (
             Spacer(modifier = Modifier.height(40.dp))
 
         }
-
-
     }
 
 }

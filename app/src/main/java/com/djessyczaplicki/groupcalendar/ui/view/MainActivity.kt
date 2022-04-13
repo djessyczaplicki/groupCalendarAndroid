@@ -9,6 +9,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
@@ -18,6 +20,9 @@ import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val TAG = "MainActivity"
+    private lateinit var navController: NavHostController
     private val loginViewModel: LoginViewModel by viewModels()
     private val timetableViewModel: TimetableViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
@@ -37,14 +43,27 @@ class MainActivity : ComponentActivity() {
     private val inviteViewModel: InviteViewModel by viewModels()
     private val registerViewModel: RegisterViewModel by viewModels()
 
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1234) {
+            Log.d(TAG, "HELLO")
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            loginViewModel.finishLogin(task, intent, navController, this)
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         handleIntent(intent)
         handleCloudMessaging()
 
         setContent {
+            navController = rememberNavController()
             MainScreen(
                 loginViewModel,
                 timetableViewModel,
@@ -53,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 editGroupViewModel,
                 inviteViewModel,
                 registerViewModel,
+                navController,
                 intent
             )
         }
@@ -62,6 +82,8 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         handleIntent(intent)
     }
+
+
 
     private fun handleIntent(intent: Intent) {
         val appLinkAction = intent.action

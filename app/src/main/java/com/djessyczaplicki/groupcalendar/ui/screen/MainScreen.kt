@@ -3,6 +3,8 @@ package com.djessyczaplicki.groupcalendar.ui.screen
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,11 +36,11 @@ fun MainScreen(
     editGroupViewModel: EditGroupViewModel,
     inviteViewModel: InviteViewModel,
     registerViewModel: RegisterViewModel,
+    navController: NavHostController,
     intent: Intent
 ) {
 
     GroupCalendarTheme {
-        val navController = rememberNavController()
         NavHost(
             navController = navController,
             startDestination = AppScreens.LoginScreen.route

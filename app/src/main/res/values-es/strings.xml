@@ -89,5 +89,9 @@
     <string name="email_empty">Por favor, introduzca el correo.</string>
     <string name="wrong_age">No puede ser mayor de 99 años.</string>
     <string name="username_length_exception">¡Su nombre de usuario tiene que ser de al menos 6 caracteres, y menor de 20 caracteres!</string>
+    <string name="login_with_google">Conéctate con Google</string>
+    <string name="google_sign_in_failed">La autenticación con Google ha fallado</string>
+    <string name="default_notification_channel_name">General</string>
+    <string name="error_email_password">Por favor, introduzca el correo y la contraseña</string>
 
 </resources>
