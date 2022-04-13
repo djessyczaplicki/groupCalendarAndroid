@@ -10,6 +10,8 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import coil.Coil
+import com.djessyczaplicki.groupcalendar.GroupCalendarApp
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.view.MainActivity
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
@@ -20,7 +22,7 @@ import kotlin.concurrent.thread
 
 
 open class MessagingService : FirebaseMessagingService() {
-    val NOTIFICATION_CHANNEL_ID = getString(R.string.default_notification_channel_id)
+    val NOTIFICATION_CHANNEL_ID = GroupCalendarApp.applicationContext().getString(R.string.default_notification_channel_id)
 
     override fun onNewToken(token: String) {
         Log.e("NEW_TOKEN", token);
@@ -49,7 +51,7 @@ open class MessagingService : FirebaseMessagingService() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT + PendingIntent.FLAG_NO_CREATE
+            PendingIntent.FLAG_ONE_SHOT
         )
         val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
@@ -81,7 +83,7 @@ open class MessagingService : FirebaseMessagingService() {
             notificationChannel.description = "Description"
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.RED
-            notificationChannel.vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+            notificationChannel.vibrationPattern = longArrayOf(0, 100, 200, 100)
             notificationChannel.enableVibration(true)
             notificationChannel.canBypassDnd()
 

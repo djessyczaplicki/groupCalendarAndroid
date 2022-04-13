@@ -1,12 +1,13 @@
 package com.djessyczaplicki.groupcalendar.data.network
 
 import android.util.Log
-import com.djessyczaplicki.groupcalendar.data.remote.model.Event
-import com.djessyczaplicki.groupcalendar.data.remote.model.Group
-import com.djessyczaplicki.groupcalendar.data.remote.model.User
+import com.djessyczaplicki.groupcalendar.data.remote.model.*
 import javax.inject.Inject
 
-class Repository @Inject constructor(private val api:ApiClient){
+class Repository @Inject constructor(
+    private val api: ApiClient,
+    private val notificationApi: NotificationApi
+) {
     private val TAG = "Service"
 
 //    suspend fun getAllGroups(): List<Group>{
@@ -15,13 +16,13 @@ class Repository @Inject constructor(private val api:ApiClient){
 //        return response.body() ?: emptyList()
 //    }
 
-    suspend fun updateGroupEvents(group: Group): List<Event>{
+    suspend fun updateGroupEvents(group: Group): List<Event> {
         val response = api.updateGroupEvents(group.events, group.id)
         Log.i(TAG, response.toString())
         return response.body() ?: emptyList()
     }
 
-    suspend fun updateGroup(group: Group): Group{
+    suspend fun updateGroup(group: Group): Group {
         val response = api.updateGroup(group, group.id)
         Log.i(TAG, response.toString())
         return response.body()!!
@@ -39,10 +40,16 @@ class Repository @Inject constructor(private val api:ApiClient){
         return response.body()
     }
 
-    suspend fun updateUser(user: User): User{
+    suspend fun updateUser(user: User): User {
         val response = api.updateUser(user, user.id)
         Log.i(TAG, response.toString())
         return response.body()!!
+    }
+
+    suspend fun sendNotification(pushNotification: PushNotification): FCMTopicBody? {
+        val response = notificationApi.postNotification(pushNotification)
+        Log.i(TAG, response.toString())
+        return response.body()
     }
 
 //    suspend fun createGroup(group: Group): Group {

@@ -3,12 +3,10 @@ package com.djessyczaplicki.groupcalendar.ui.screen
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventScreen
@@ -23,6 +21,8 @@ import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.sendnotification.SendNotificationScreen
+import com.djessyczaplicki.groupcalendar.ui.screen.sendnotification.SendNotificationViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
@@ -36,6 +36,7 @@ fun MainScreen(
     editGroupViewModel: EditGroupViewModel,
     inviteViewModel: InviteViewModel,
     registerViewModel: RegisterViewModel,
+    sendNotificationViewModel: SendNotificationViewModel,
     navController: NavHostController,
     intent: Intent
 ) {
@@ -125,6 +126,7 @@ fun MainScreen(
                 // resetting values
                 editGroupViewModel.groupId = null
                 editGroupViewModel.isEditing.value = false
+                editGroupViewModel.users.value = emptyList()
 
                 EditGroupScreen(navController, editGroupViewModel)
             }
@@ -143,7 +145,18 @@ fun MainScreen(
             composable(
                 AppScreens.RegisterScreen.route
             ) {
-                RegisterScreen(navController = navController, registerViewModel = registerViewModel)
+                RegisterScreen(navController, registerViewModel)
+            }
+            composable(
+                AppScreens.SendNotificationScreen.route + AppScreensVariables.GroupId.variable,
+                arguments = listOf(
+                    navArgument("group_id") { type = NavType.StringType }
+                )
+            ) {
+                val groupId = it.arguments?.getString("group_id")!!
+                sendNotificationViewModel.groupId = groupId
+                sendNotificationViewModel.loadGroup()
+                SendNotificationScreen(navController, sendNotificationViewModel)
             }
         }
     }

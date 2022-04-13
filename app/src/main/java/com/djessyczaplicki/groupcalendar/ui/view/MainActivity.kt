@@ -4,14 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
@@ -19,6 +17,7 @@ import com.djessyczaplicki.groupcalendar.ui.screen.event.EventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.invite.InviteViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
+import com.djessyczaplicki.groupcalendar.ui.screen.sendnotification.SendNotificationViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -42,6 +41,7 @@ class MainActivity : ComponentActivity() {
     private val editGroupViewModel: EditGroupViewModel by viewModels()
     private val inviteViewModel: InviteViewModel by viewModels()
     private val registerViewModel: RegisterViewModel by viewModels()
+    private val sendNotificationViewModel: SendNotificationViewModel by viewModels()
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 editGroupViewModel,
                 inviteViewModel,
                 registerViewModel,
+                sendNotificationViewModel,
                 navController,
                 intent
             )
@@ -84,19 +85,26 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
     private fun handleIntent(intent: Intent) {
         val appLinkAction = intent.action
         val appLinkData: Uri? = intent.data
         if (Intent.ACTION_VIEW == appLinkAction) {
+            val newIntent = Intent(this, MainActivity::class.java)
             val args = appLinkData?.encodedPath?.split("/")
             val option = args?.get(1)
             val value = args?.get(2)
             when (option) {
-                "group" -> intent.putExtra("group_id", value)
-                "invite" -> intent.putExtra("invite", value)
-                "event" -> intent.putExtra("event", value)
+                "group" -> newIntent.putExtra("group_id", value)
+                "invite" -> newIntent.putExtra("invite", value)
+                "event" -> newIntent.putExtra("event", value)
             }
+            newIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+            )
+            this.startActivity(newIntent)
+            this.finish()
         }
 
 //            appLinkData?.lastPathSegment?.also { groupId ->
@@ -107,7 +115,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleCloudMessaging() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        val firebaseMessaging = FirebaseMessaging.getInstance()
+        firebaseMessaging.token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener

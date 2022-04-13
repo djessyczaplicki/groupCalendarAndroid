@@ -45,17 +45,18 @@ fun EditGroupScreen(
     var description by rememberSaveable { mutableStateOf("") }
     var image by rememberSaveable { mutableStateOf(context.resources.getString(R.string.image_placeholder_url)) }
     var imageBitmap by rememberSaveable { mutableStateOf<Bitmap?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
-        imageBitmap = if (Build.VERSION.SDK_INT < 28) {
-            MediaStore.Images.Media.getBitmap(
-                context.contentResolver,
-                imageUri
-            )
-        } else {
-            val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
-            ImageDecoder.decodeBitmap(source)
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
+            imageBitmap = if (Build.VERSION.SDK_INT < 28) {
+                MediaStore.Images.Media.getBitmap(
+                    context.contentResolver,
+                    imageUri
+                )
+            } else {
+                val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
+                ImageDecoder.decodeBitmap(source)
+            }
         }
-    }
 
 
     // load group if groupId is set
@@ -89,7 +90,7 @@ fun EditGroupScreen(
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 if (imageBitmap != null) {
                     Image(
                         imageBitmap!!.asImageBitmap(),
@@ -126,7 +127,7 @@ fun EditGroupScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text(stringResource(id = R.string.name)) },
-                placeholder = { Text(stringResource(id = R.string.group_name))},
+                placeholder = { Text(stringResource(id = R.string.group_name)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
@@ -136,7 +137,7 @@ fun EditGroupScreen(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text(stringResource(id = R.string.description)) },
-                placeholder = { Text(stringResource(id = R.string.group_description))},
+                placeholder = { Text(stringResource(id = R.string.group_description)) },
                 singleLine = false,
                 modifier = Modifier
                     .height(120.dp)
@@ -211,6 +212,15 @@ fun EditGroupScreen(
                             }
                         ) {
                             Text("Invite")
+                        }
+                    }
+                    if (isEditing) {
+                        Button(
+                            onClick = {
+                                navController.navigate(AppScreens.SendNotificationScreen.route + "/${group.id}");
+                            }
+                        ) {
+                            Text("Notificar usuarios")
                         }
                     }
                 }

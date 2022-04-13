@@ -10,4 +10,5 @@ sealed class AppScreens(val route: String, val name: Int) {
     object EventScreen: AppScreens("event_screen", R.string.event_screen)
     object EditGroupScreen: AppScreens("edit_group_screen", R.string.edit_group_screen)
     object InviteScreen: AppScreens("invite_screen", R.string.invite_screen)
+    object SendNotificationScreen: AppScreens("send_notification", R.string.send_notification_screen)
 }

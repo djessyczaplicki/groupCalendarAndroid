@@ -11,22 +11,22 @@ import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TimetableViewModel @Inject constructor(
-    private val updateGroupEventsUseCase : UpdateGroupEventsUseCase,
-    private val getGroupByIdUseCase : GetGroupByIdUseCase,
-    private val getUserByIdUseCase : GetUserByIdUseCase
-): ViewModel() {
+    private val updateGroupEventsUseCase: UpdateGroupEventsUseCase,
+    private val getGroupByIdUseCase: GetGroupByIdUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase
+) : ViewModel() {
     val events = mutableStateOf(listOf<Event>())
     val groups = mutableStateOf(listOf<Group>())
     val shownGroups = mutableStateOf(listOf<Group>())
     val group = mutableStateOf(Group())
     val groupId = mutableStateOf("")
-
 
 
     fun loadGroups() {
@@ -41,8 +41,16 @@ class TimetableViewModel @Inject constructor(
                 }
             }
             if (groups.value.isNotEmpty()) {
-               groups.value = groups.value.toMutableList().sortedBy { it.name }
+                groups.value = groups.value.toMutableList().sortedBy { it.name }
             }
+            subscribeToGroups()
+        }
+    }
+
+    private fun subscribeToGroups() {
+        val firebaseMessaging = FirebaseMessaging.getInstance()
+        groups.value.forEach { group ->
+            firebaseMessaging.subscribeToTopic(group.id)
         }
     }
 

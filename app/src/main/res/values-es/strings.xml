@@ -93,5 +93,11 @@
     <string name="google_sign_in_failed">La autenticación con Google ha fallado</string>
     <string name="default_notification_channel_name">General</string>
     <string name="error_email_password">Por favor, introduzca el correo y la contraseña</string>
+    <string name="send_notification_screen">Enviar notificación</string>
+    <string name="group_not_found_exception">Grupo no encontrado</string>
+    <string name="text">Texto</string>
+    <string name="send_a_message_to_group">Envía una notificación a todos los miembros del grupo</string>
+    <string name="notification_sent">Notificación enviada</string>
+    <string name="error_sending_notification">Ha ocurrido un error al enviar la notificación</string>
 
 </resources>

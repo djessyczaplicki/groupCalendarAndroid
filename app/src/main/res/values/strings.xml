@@ -96,5 +96,11 @@
     <string name="google_sign_in_failed">Google sign in failed</string>
     <string name="default_notification_channel_name">General</string>
     <string name="error_email_password">Please enter the email and the password</string>
+    <string name="send_notification_screen">Send notification</string>
+    <string name="group_not_found_exception">Group not found</string>
+    <string name="text">Text</string>
+    <string name="send_a_message_to_group">Send a notification to all the members of the actual group</string>
+    <string name="notification_sent">Notification sent</string>
+    <string name="error_sending_notification">An error occured while trying to send the notification</string>
 
 </resources>

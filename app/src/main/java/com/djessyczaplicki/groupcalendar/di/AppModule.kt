@@ -1,21 +1,14 @@
 package com.djessyczaplicki.groupcalendar.di
 
-import android.content.Context
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.core.AuthenticationInterceptor
 import com.djessyczaplicki.groupcalendar.data.network.ApiClient
+import com.djessyczaplicki.groupcalendar.data.network.NotificationApi
 import com.djessyczaplicki.groupcalendar.util.Constants
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -55,6 +48,12 @@ object AppModule {
     @Provides
     fun provideApiClient(retrofit: Retrofit): ApiClient {
         return retrofit.create(ApiClient::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificationApi(retrofit: Retrofit): NotificationApi {
+        return retrofit.create(NotificationApi::class.java)
     }
 
 
