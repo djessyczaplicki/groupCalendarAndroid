@@ -83,18 +83,16 @@
     <string name="register">Register</string>
     <string name="disconnect">Disconnect</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="surname">Surname</string>
+    <string name="surname">Last name</string>
     <string name="age">Age</string>
     <string name="passwords_dont_match">Passwords don\'t match!</string>
     <string name="password_must_be_6_or_greater">The password must be 6 characters long or greater!</string>
     <string name="email_empty">Please enter the email.</string>
     <string name="wrong_age">You can\'t be older than 99 years.</string>
     <string name="username_length_exception">Your username must be longer than 6 characters and shorter than 20 characters!</string>
-    <string name="default_notification_channel_id" translatable="false">groupcalendarchannel</string>
     <string name="login_with_google">Login with Google</string>
     <string name="web_client_id" translatable="false">721316487520-u2vk788n1hi208gel8fnjfnfdh253lbf.apps.googleusercontent.com</string>
     <string name="google_sign_in_failed">Google sign in failed</string>
-    <string name="default_notification_channel_name">General</string>
     <string name="error_email_password">Please enter the email and the password</string>
     <string name="send_notification_screen">Send notification</string>
     <string name="group_not_found_exception">Group not found</string>
@@ -102,5 +100,11 @@
     <string name="send_a_message_to_group">Send a notification to all the members of the actual group</string>
     <string name="notification_sent">Notification sent</string>
     <string name="error_sending_notification">An error occured while trying to send the notification</string>
+    <string name="default_notification_channel_id" translatable="false">groupcalendargeneralchannel</string>
+    <string name="default_notification_channel_name">General</string>
+    <string name="default_notification_channel_description">Group Calendar general notifications</string>
+    <string name="alarm_set_successfully">Alarm set successfully</string>
+    <string name="this_event_requires_confirmation">This event requires confirmation from the members</string>
+    <string name="deny_attendance">Deny attendance:</string>
 
 </resources>

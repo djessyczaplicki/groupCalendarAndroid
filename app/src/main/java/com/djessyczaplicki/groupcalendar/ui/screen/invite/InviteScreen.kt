@@ -1,16 +1,11 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.invite
 
-import android.media.Image
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -20,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -28,6 +22,7 @@ import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InviteScreen(
     navController: NavController,
@@ -49,8 +44,7 @@ fun InviteScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Card(
-                elevation = 8.dp,
+            ElevatedCard(
                 modifier = Modifier
                     .padding(horizontal = 50.dp)
                     .align(Alignment.CenterHorizontally)
@@ -85,7 +79,11 @@ fun InviteScreen(
                                     goToGroupsTimetable(navController, group.id)
                                 },
                                 userAlreadyInGroup = {
-                                    Toast.makeText(context, context.getString(R.string.user_already_in_group), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.user_already_in_group),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     goToGroupsTimetable(navController, group.id)
                                 }
                             )

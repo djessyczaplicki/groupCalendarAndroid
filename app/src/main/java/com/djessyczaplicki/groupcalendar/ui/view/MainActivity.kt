@@ -7,9 +7,9 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.djessyczaplicki.groupcalendar.core.AuthenticationInterceptor
 import com.djessyczaplicki.groupcalendar.ui.screen.MainScreen
 import com.djessyczaplicki.groupcalendar.ui.screen.editevent.EditEventViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.editgroup.EditGroupViewModel
@@ -19,11 +19,17 @@ import com.djessyczaplicki.groupcalendar.ui.screen.login.LoginViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.register.RegisterViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.sendnotification.SendNotificationViewModel
 import com.djessyczaplicki.groupcalendar.ui.screen.timetable.TimetableViewModel
+import com.djessyczaplicki.groupcalendar.util.UserPreferences
+import com.djessyczaplicki.groupcalendar.util.createNotificationChannel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author Djessy Czaplicki
@@ -31,6 +37,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var interceptor: AuthenticationInterceptor
 
     private val TAG = "MainActivity"
     private lateinit var navController: NavHostController
@@ -57,10 +66,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        installSplashScreen()
         super.onCreate(savedInstanceState)
+        loadToken()
         handleIntent(intent)
         handleCloudMessaging()
+        createNotificationChannel()
 
         setContent {
             navController = rememberNavController()
@@ -76,6 +86,16 @@ class MainActivity : ComponentActivity() {
                 navController,
                 intent
             )
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun loadToken() {
+        val context = this
+        GlobalScope.launch {
+            UserPreferences(context).authToken.collect { token ->
+                interceptor.setSessionToken(token ?: "")
+            }
         }
     }
 
@@ -96,7 +116,10 @@ class MainActivity : ComponentActivity() {
             when (option) {
                 "group" -> newIntent.putExtra("group_id", value)
                 "invite" -> newIntent.putExtra("invite", value)
-                "event" -> newIntent.putExtra("event", value)
+                "event" -> {
+                    newIntent.putExtra("group_id", args[2])
+                    newIntent.putExtra("event_id", args[3])
+                }
             }
             newIntent.addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or

@@ -1,24 +1,17 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.editgroup
 
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,9 +20,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
-import com.djessyczaplicki.groupcalendar.ui.item.GroupUserRow
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 
 @Composable
@@ -43,18 +37,11 @@ fun EditGroupScreen(
 
     var name by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
-    var image by rememberSaveable { mutableStateOf(context.resources.getString(R.string.image_placeholder_url)) }
-    var imageBitmap by rememberSaveable { mutableStateOf<Bitmap?>(null) }
+    var image by rememberSaveable { mutableStateOf("") }
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
-            imageBitmap = if (Build.VERSION.SDK_INT < 28) {
-                MediaStore.Images.Media.getBitmap(
-                    context.contentResolver,
-                    imageUri
-                )
-            } else {
-                val source = ImageDecoder.createSource(context.contentResolver, imageUri!!)
-                ImageDecoder.decodeBitmap(source)
+            if (imageUri != null) {
+                image = imageUri.toString()
             }
         }
 
@@ -73,10 +60,13 @@ fun EditGroupScreen(
     }
 
     Surface(
-        color = Color.White
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            Modifier.verticalScroll(rememberScrollState())
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 10.dp)
         ) {
 
             Text(
@@ -87,30 +77,18 @@ fun EditGroupScreen(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1
             )
+            Spacer(Modifier.height(20.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (imageBitmap != null) {
-                    Image(
-                        imageBitmap!!.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clickable {
-                                launcher.launch("image/*")
-                            }
-                    )
-                    if (editGroupViewModel.isLoading)
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .width(50.dp)
-                                .padding(top = 30.dp),
-                            strokeWidth = 5.dp
-                        )
-                } else {
+                Box {
                     SubcomposeAsyncImage(
-                        model = image,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(image.ifEmpty { stringResource(id = R.string.image_placeholder_url) })
+                            .crossfade(true)
+                            .transformations(CircleCropTransformation())
+                            .build(),
                         loading = {
                             CircularProgressIndicator()
                         },
@@ -121,8 +99,18 @@ fun EditGroupScreen(
                                 launcher.launch("image/*")
                             }
                     )
+                    if (editGroupViewModel.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .padding(top = 30.dp, start = 10.dp),
+                            strokeWidth = 5.dp
+                        )
+                    }
                 }
+
             }
+            Spacer(Modifier.height(20.dp))
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -157,73 +145,67 @@ fun EditGroupScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 5.dp)
                     .requiredHeightIn(max = 300.dp)
+                    .background(MaterialTheme.colorScheme.surface)
                     .border(
-                        BorderStroke(1.dp, colorResource(id = R.color.lighter_grey)),
+                        BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                         shape = RectangleShape
                     )
             ) {
                 items(editGroupViewModel.users.value) { user ->
-
                     Box {
                         GroupUserRow(user, group, editGroupViewModel)
-
                     }
                 }
             }
 
 
-
+            Spacer(modifier = Modifier.height(10.dp))
             Row(
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceAround,
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                if (name.isNotBlank()) {
+                Button(
+                    enabled = name.isNotBlank(),
+                    onClick = {
+                        if (editGroupViewModel.isLoading) return@Button
+                        if (isEditing) {
+                            group.name = name
+                            group.description = description
+                            editGroupViewModel.editGroup(group, image) {
+                                navController.popBackStack()
+                            }
+                        } else {
+                            val newGroup = Group(
+                                name = name,
+                                description = description
+                            )
+                            editGroupViewModel.editGroup(newGroup, image) {
+                                navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
+                                    popUpTo(0)
+                                }
+                            }
+                        }
+                    }) {
+                    Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                }
+                if (isEditing) {
                     Button(
                         onClick = {
-                            if (editGroupViewModel.isLoading) return@Button
-                            if (isEditing) {
-                                val group = editGroupViewModel.group.value
-                                group.name = name
-                                group.description = description
-                                editGroupViewModel.editGroup(group, imageBitmap) {
-                                    navController.popBackStack()
-                                }
-                            } else {
-                                val newGroup = Group(
-                                    name = name,
-                                    description = description
-                                )
-                                editGroupViewModel.editGroup(newGroup, imageBitmap) {
-                                    //                             Doesn't work because the group isn't created yet when the app tries to load the view
-                                    navController.navigate(AppScreens.TimetableScreen.route + "/${group.id}") {
-                                        popUpTo(0)
-                                    }
-//                                    navController.popBackStack()
-                                }
-                            }
-                        }) {
-                        Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
-                    }
-                    if (isEditing) {
-                        Button(
-                            onClick = {
-                                editGroupViewModel.sendInviteLink(context);
-                            }
-                        ) {
-                            Text("Invite")
+                            editGroupViewModel.sendInviteLink(context);
                         }
+                    ) {
+                        Text("Invite")
                     }
-                    if (isEditing) {
-                        Button(
-                            onClick = {
-                                navController.navigate(AppScreens.SendNotificationScreen.route + "/${group.id}");
-                            }
-                        ) {
-                            Text("Notificar usuarios")
+                    Button(
+                        onClick = {
+                            navController.navigate(AppScreens.SendNotificationScreen.route + "/${group.id}");
                         }
+                    ) {
+                        Text("Notificar usuarios")
                     }
                 }
+
             }
         }
 

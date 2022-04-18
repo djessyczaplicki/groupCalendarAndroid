@@ -3,6 +3,7 @@ package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +30,7 @@ fun BasicDayHeader(
         fontSize = 12.sp,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = modifier
             .fillMaxWidth()
             .padding(2.dp)

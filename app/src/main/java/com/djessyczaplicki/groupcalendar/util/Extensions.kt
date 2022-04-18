@@ -1,6 +1,6 @@
 package com.djessyczaplicki.groupcalendar.util
 
-import android.content.Context
+import com.djessyczaplicki.groupcalendar.GroupCalendarApp
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.google.firebase.auth.ktx.auth
@@ -26,9 +26,10 @@ fun String.capitalize() = this.replaceFirstChar {
 
 
 fun User.fullName(): String = "${this.name.capitalize()} ${this.surname.capitalize()}"
-fun User.fullNameYou(userId: String, context: Context): String {
+fun User.fullNameYou(userId: String): String {
+    val context = GroupCalendarApp.applicationContext()
     val uid = Firebase.auth.currentUser!!.uid
-    var output = "${this.name.capitalize()} ${this.surname.capitalize()}"
+    var output = this.fullName()
     if (uid == userId) {
         output += " " + context.getString(R.string.you)
     }

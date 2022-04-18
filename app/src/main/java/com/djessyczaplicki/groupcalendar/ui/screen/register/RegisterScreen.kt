@@ -2,17 +2,16 @@ package com.djessyczaplicki.groupcalendar.ui.screen.register
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -86,7 +83,7 @@ fun RegisterScreen(
     }
 
     Surface(
-        color = MaterialTheme.colors.background,
+        color = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -102,10 +99,9 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(80.dp)
                     .align(CenterHorizontally)
-                    .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_calendar_icon),
+                    painter = painterResource(id = R.drawable.ic_calendar),
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
@@ -194,7 +190,6 @@ fun RegisterScreen(
 }
 
 
-
 @Composable
 fun RegisterTextField(
     value: String,
@@ -221,10 +216,7 @@ fun RegisterTextField(
         keyboardActions = KeyboardActions(
             onDone = { onDone() }
         ),
-        label = { Text(text) },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = colorResource(id = R.color.text_field_bg)
-        )
+        label = { Text(text) }
     )
 }
 
@@ -261,10 +253,7 @@ fun PasswordTextField(
             IconButton(onClick = { onVisibilityChanged() }) {
                 Icon(imageVector = image, "")
             }
-        },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = colorResource(id = R.color.text_field_bg)
-        )
+        }
     )
 }
 

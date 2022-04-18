@@ -5,7 +5,7 @@ import android.content.Context
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class GroupCalendarApp: Application() {
+class GroupCalendarApp : Application() {
     init {
         instance = this
     }
@@ -24,6 +24,5 @@ class GroupCalendarApp: Application() {
 
         // Use ApplicationContext.
         // example: SharedPreferences etc...
-        val context: Context = applicationContext()
     }
 }

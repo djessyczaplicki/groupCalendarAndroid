@@ -1,28 +1,26 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.login
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,12 +35,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen (
+fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel,
     intent: Intent
@@ -52,7 +48,7 @@ fun LoginScreen (
 
 
     LaunchedEffect("login_test") {
-        loginViewModel.testAuth(context){
+        loginViewModel.testAuth(context) {
             loginViewModel.success(intent, navController)
         }
     }
@@ -61,20 +57,52 @@ fun LoginScreen (
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    fun login() {
+        if (email.isBlank() || password.isBlank()) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.error_email_password),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        loginViewModel.login(
+            email,
+            password,
+            context,
+            onSuccessCallback = {
+                loginViewModel.success(intent, navController)
+            },
+            onFailureCallback = {
+                Toast.makeText(
+                    context,
+                    it ?: context.getText(R.string.wrong_credentials),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+    }
+
     Surface(
-        color = MaterialTheme.colors.background,
+        color = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        Column (
+        Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = CenterHorizontally
         ) {
 
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.h5, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
@@ -82,10 +110,9 @@ fun LoginScreen (
                     .fillMaxWidth()
                     .height(250.dp)
                     .align(CenterHorizontally)
-                    .background(Color.White)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_calendar_icon),
+                    painter = painterResource(id = R.drawable.ic_calendar),
                     contentDescription = stringResource(id = R.string.app_name),
                     modifier = Modifier.fillMaxSize()
                 )
@@ -113,54 +140,57 @@ fun LoginScreen (
                 onValueChange = { password = it },
                 label = stringResource(R.string.password),
                 passwordVisibility = passwordVisibility,
+                onDone = {
+                    keyboardController?.hide()
+                    login()
+                },
                 onVisibilityChanged = { passwordVisibility = !passwordVisibility }
             )
             Spacer(modifier = Modifier.height(40.dp))
-            Button(
+            ElevatedButton(
                 modifier = Modifier
                     .height(50.dp)
-                    .width(200.dp),
+                    .width(240.dp),
                 onClick = {
-                    if (email.isBlank() || password.isBlank()) {
-                        Toast.makeText(context, context.getString(R.string.error_email_password), Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-                    loginViewModel.login(
-                        email,
-                        password,
-                        context,
-                        onSuccessCallback = {
-                            loginViewModel.success(intent, navController)
-                        },
-                        onFailureCallback = {
-                            Toast.makeText(context, it ?: context.getText(R.string.wrong_credentials), Toast.LENGTH_SHORT).show()
-                        }
-                    )
+                    login()
                 }
             ) {
                 Text(text = stringResource(id = R.string.login))
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-            Button(
+            ElevatedButton(
                 modifier = Modifier
                     .height(50.dp)
-                    .width(200.dp),
+                    .width(240.dp),
                 onClick = {
                     loginViewModel.loginWithGoogle(context)
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
             ) {
-                Text(text = stringResource(id = R.string.login_with_google))
+                Icon(
+                    painter = painterResource(id = R.drawable.google_g_logo),
+                    contentDescription = stringResource(id = R.string.login_with_google),
+                    modifier = Modifier.height(25.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(id = R.string.login_with_google),
+                    color = MaterialTheme.colorScheme.onError
+                )
             }
             Spacer(modifier = Modifier.height(30.dp))
 
             Text(stringResource(R.string.or))
             Spacer(modifier = Modifier.height(30.dp))
 
-            Button(
+            ElevatedButton(
                 modifier = Modifier
                     .height(50.dp)
-                    .width(200.dp),
+                    .width(240.dp),
                 onClick = {
                     navController.navigate(AppScreens.RegisterScreen.route)
                 }
@@ -191,9 +221,6 @@ fun LoginTextField(
             imeAction = ImeAction.Next
         ),
         label = { Text(label) },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = colorResource(id = R.color.text_field_bg)
-        )
     )
 }
 
@@ -204,6 +231,7 @@ fun LoginPasswordTextField(
     required: Boolean = false,
     onValueChange: (value: String) -> Unit,
     passwordVisibility: Boolean,
+    onDone: () -> Unit = {},
     onVisibilityChanged: () -> Unit
 ) {
     var text = label
@@ -221,6 +249,9 @@ fun LoginPasswordTextField(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
+        keyboardActions = KeyboardActions(onDone = {
+            onDone()
+        }),
         trailingIcon = {
             val image = if (passwordVisibility)
                 Icons.Filled.Visibility
@@ -230,9 +261,6 @@ fun LoginPasswordTextField(
                 Icon(imageVector = image, "")
             }
         },
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = colorResource(id = R.color.text_field_bg)
-        )
     )
 }
 

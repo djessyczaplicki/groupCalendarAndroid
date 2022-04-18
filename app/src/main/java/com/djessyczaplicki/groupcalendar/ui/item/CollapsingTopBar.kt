@@ -3,14 +3,15 @@ package com.djessyczaplicki.groupcalendar.ui.item
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.djessyczaplicki.groupcalendar.ui.item.CollapsingTopBar.BACK_ID
 import com.djessyczaplicki.groupcalendar.ui.item.CollapsingTopBar.EDIT_ID
 import com.djessyczaplicki.groupcalendar.ui.item.CollapsingTopBar.SHARE_ID
@@ -28,6 +30,7 @@ import kotlin.math.roundToInt
 fun Collapsing(
     modifier: Modifier = Modifier,
     collapseFactor: Float = 1f, // A value from (0-1) where 0 means fully expanded
+    showEdit: Boolean,
     content: @Composable () -> Unit
 ) {
     val map = mutableMapOf<Placeable, Int>()
@@ -43,8 +46,11 @@ fun Collapsing(
                 SHARE_ID -> measurable.measure(constraints)
                 TITLE_ID ->
                     measurable.measure(
-                        Constraints.fixedWidth(constraints.maxWidth
-                            - (collapseFactor * (placeables.first().width * 2)).toInt()))
+                        Constraints.fixedWidth(
+                            constraints.maxWidth
+                                    - (collapseFactor * (placeables.first().width * 2)).toInt()
+                        )
+                    )
                 EDIT_ID ->
                     measurable.measure(constraints)
                 else -> throw IllegalStateException("Id Not found")
@@ -60,7 +66,8 @@ fun Collapsing(
                 when (map[placeable]) {
                     BACK_ID -> placeable.placeRelative(0, 0)
                     SHARE_ID -> placeable.run {
-                        placeRelative(constraints.maxWidth - width, 0)
+                        val spacing = if (showEdit) 2 else 1
+                        placeRelative(constraints.maxWidth - width * spacing, 0)
                     }
                     TITLE_ID -> placeable.run {
                         val widthOffset = (placeables[0].width * collapseFactor).roundToInt()
@@ -71,7 +78,7 @@ fun Collapsing(
                         )
                     }
                     EDIT_ID -> placeable.run {
-                        placeRelative(constraints.maxWidth - width * 2, 0)
+                        placeRelative(constraints.maxWidth - width, 0)
                     }
                 }
             }
@@ -95,7 +102,9 @@ fun CollapsingTopBar(
     title: String,
     onBack: () -> Unit,
     onShare: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    showEdit: Boolean = true
 ) {
 
     Box(
@@ -103,6 +112,7 @@ fun CollapsingTopBar(
     ) {
         Collapsing(
             collapseFactor = 0.1f,
+            showEdit = showEdit,
             modifier = Modifier
         ) {
             Icon(
@@ -112,18 +122,8 @@ fun CollapsingTopBar(
                     .clickable { onBack() }
                     .padding(12.dp),
                 imageVector = Icons.Filled.ArrowBack,
-                tint = MaterialTheme.colors.onPrimary,
+                tint = contentColor,
                 contentDescription = "back"
-            )
-            Icon(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .layoutId(EDIT_ID)
-                    .clickable { onEdit() }
-                    .padding(12.dp),
-                imageVector = Icons.Filled.EditCalendar,
-                tint = MaterialTheme.colors.onPrimary,
-                contentDescription = "edit"
             )
             Icon(
                 modifier = Modifier
@@ -132,16 +132,30 @@ fun CollapsingTopBar(
                     .clickable { onShare() }
                     .padding(12.dp),
                 imageVector = Icons.Filled.Share,
-                tint = MaterialTheme.colors.onPrimary,
+                tint = contentColor,
                 contentDescription = "share"
             )
+            if (showEdit) {
+                Icon(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .layoutId(EDIT_ID)
+                        .clickable { onEdit() }
+                        .padding(12.dp),
+                    imageVector = Icons.Filled.EditCalendar,
+                    tint = contentColor,
+                    contentDescription = "edit"
+                )
+            }
             Text(
                 modifier = Modifier
-                    .layoutId(CollapsingTopBar.TITLE_ID)
+                    .layoutId(TITLE_ID)
                     .wrapContentHeight()
                     .padding(horizontal = 4.dp),
                 text = title,
-                style = MaterialTheme.typography.h4.copy(color = MaterialTheme.colors.onPrimary),
+                fontSize = 30.sp,
+                style = MaterialTheme.typography.titleLarge.copy(color = contentColor),
+                color = contentColor,
                 overflow = TextOverflow.Ellipsis
             )
         }

@@ -34,7 +34,7 @@
     <string name="end_time">Hora fin</string>
     <string name="is_recurrent">¿Es recurrente?</string>
     <string name="select_week_day">Selecciona un día de la semana:</string>
-    <string name="require_confirmation">¿Require confirmación de los participantes?</string>
+    <string name="require_confirmation">¿Requiere confirmación de los participantes?</string>
     <string name="edit_event">Editar evento</string>
     <string name="edit_event_screen">Editar evento</string>
     <string name="this_is_a_recurrent_event">Este evento es recurrente</string>
@@ -91,7 +91,6 @@
     <string name="username_length_exception">¡Su nombre de usuario tiene que ser de al menos 6 caracteres, y menor de 20 caracteres!</string>
     <string name="login_with_google">Conéctate con Google</string>
     <string name="google_sign_in_failed">La autenticación con Google ha fallado</string>
-    <string name="default_notification_channel_name">General</string>
     <string name="error_email_password">Por favor, introduzca el correo y la contraseña</string>
     <string name="send_notification_screen">Enviar notificación</string>
     <string name="group_not_found_exception">Grupo no encontrado</string>
@@ -99,5 +98,10 @@
     <string name="send_a_message_to_group">Envía una notificación a todos los miembros del grupo</string>
     <string name="notification_sent">Notificación enviada</string>
     <string name="error_sending_notification">Ha ocurrido un error al enviar la notificación</string>
+    <string name="default_notification_channel_name">General</string>
+    <string name="default_notification_channel_description">Notificaciones generales de Calendario de Grupo</string>
+    <string name="alarm_set_successfully">Alarma establecida</string>
+    <string name="this_event_requires_confirmation">Este evento requiere la confirmación de los participantes</string>
+    <string name="deny_attendance">Denegar asistencia:</string>
 
 </resources>

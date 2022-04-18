@@ -6,9 +6,11 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -27,7 +29,8 @@ import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 fun GroupRow(
     onDestinationClicked: (route: String) -> Unit,
     group: Group,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -35,7 +38,8 @@ fun GroupRow(
         modifier = Modifier
             .clickable { onDestinationClicked(AppScreens.TimetableScreen.route + "/${group.id}") }
             .fillMaxWidth()
-            .padding(horizontal = 15.dp, vertical = 8.dp).fillMaxWidth()
+            .padding(horizontal = 15.dp, vertical = 8.dp)
+            .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 8.dp)
 
     ) {
@@ -60,7 +64,8 @@ fun GroupRow(
                 text = group.name,
                 fontWeight = FontWeight.SemiBold,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
+                modifier = Modifier,
+                color = contentColor
             )
         }
         if (icon != null) {
@@ -71,7 +76,11 @@ fun GroupRow(
                 modifier = Modifier
                     .size(20.dp)
             ) {
-                Icon(imageVector = icon, contentDescription = stringResource(id = R.string.edit))
+                Icon(
+                    imageVector = icon,
+                    contentDescription = stringResource(id = R.string.edit),
+                    tint = contentColor,
+                )
             }
         }
     }

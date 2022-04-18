@@ -7,13 +7,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,16 +33,19 @@ import com.djessyczaplicki.groupcalendar.ui.item.EventUserRow
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.util.formatMinute
 import com.djessyczaplicki.groupcalendar.util.formatted
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventScreen(
     navController: NavController,
     eventViewModel: EventViewModel
 ) {
     val event = eventViewModel.event.value
+    val uid = Firebase.auth.currentUser?.uid
     val group = eventViewModel.group.value
-    val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             CollapsingTopBar(
@@ -53,11 +58,15 @@ fun EventScreen(
                     navController.popBackStack()
                 },
                 onShare = {
-                    /* TODO */
+                    eventViewModel.share(context)
                 },
                 onEdit = {
                     navController.navigate(AppScreens.EditEventScreen.route + "/${group.id}/${event.id}")
-                }
+                },
+                showEdit = group.admins.contains(uid),
+                contentColor = if (event.color.toComposeColor()
+                        .luminance() > .5
+                ) Color.Black else Color.White
             )
         },
         content = {
@@ -76,6 +85,7 @@ fun EventScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventScreenContent(
     navController: NavController,
@@ -91,7 +101,7 @@ fun EventScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-            ){
+            ) {
                 Icon(Icons.Filled.Textsms, "description", Modifier.padding(8.dp))
                 Text(
                     text = event.description!!,
@@ -100,36 +110,47 @@ fun EventScreenContent(
             }
         }
 
-        if (event.recurrenceId != null){
+        if (event.recurrenceId != null) {
             Text(
                 text = stringResource(id = R.string.this_is_a_recurrent_event),
                 fontSize = 10.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 40.dp, vertical = 4.dp)
             )
         }
 
-        Divider(thickness = 1.dp)
+        Divider(thickness = 0.5.dp)
 
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Icon(Icons.Filled.Event, "Date", Modifier.padding(8.dp))
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(id = R.string.day) + ": ")
-                    pushStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.SemiBold
+            Row {
+                Icon(Icons.Filled.Event, "Date", Modifier.padding(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        append(stringResource(id = R.string.day) + ": ")
+                        pushStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
-                    )
-                    append("${event.start.dayOfWeek.formatted()}, ${event.start.dayOfMonth}/${event.start.monthValue}/${event.start.year}")
-                },
-                modifier = Modifier.padding(4.dp)
-            )
+                        append("${event.start.dayOfWeek.formatted()}, ${event.start.dayOfMonth}/${event.start.monthValue}/${event.start.year}")
+                    },
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
+
+            IconButton(onClick = {
+                eventViewModel.setAlarm()
+            }) {
+                ElevatedCard(shape = CircleShape) {
+                    Icon(Icons.Filled.AlarmAdd, "set alarm", Modifier.padding(8.dp))
+                }
+            }
         }
 
 
@@ -144,8 +165,15 @@ fun EventScreenContent(
             EndHour(event = event, modifier = Modifier.weight(1f))
         }
 
-        Divider(thickness = 1.dp)
-
+        Divider(thickness = 0.5.dp)
+        if (event.requireConfirmation) {
+            Text(
+                text = stringResource(id = R.string.this_event_requires_confirmation),
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 40.dp, vertical = 4.dp)
+            )
+        }
         Row(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
@@ -153,26 +181,35 @@ fun EventScreenContent(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Text(stringResource(id = R.string.confirm_attendance), Modifier.padding(8.dp))
-            IconButton(onClick = {
-                eventViewModel.confirmAttendance()
-            }) {
-                Card(elevation = 4.dp, shape = CircleShape) {
-                    Icon(Icons.Filled.TaskAlt, "accept", Modifier.padding(8.dp))
+            val uid = Firebase.auth.currentUser?.uid ?: ""
+            if (event.confirmedUsers.contains(uid)) {
+                Text(stringResource(id = R.string.deny_attendance), Modifier.padding(8.dp))
+                IconButton(onClick = {
+                    eventViewModel.denyAttendance()
+                }) {
+                    ElevatedCard(shape = CircleShape) {
+                        Icon(Icons.Filled.DoNotDisturb, "deny", Modifier.padding(8.dp))
+                    }
                 }
-            }
-            IconButton(onClick = {
-                eventViewModel.denyAttendance()
-            }) {
-                Card(elevation = 4.dp, shape = CircleShape) {
-                    Icon(Icons.Filled.DoNotDisturb, "deny", Modifier.padding(8.dp))
+            } else {
+                Text(stringResource(id = R.string.confirm_attendance), Modifier.padding(8.dp))
+                IconButton(onClick = {
+                    eventViewModel.confirmAttendance()
+                }) {
+                    ElevatedCard(shape = CircleShape) {
+                        Icon(Icons.Filled.TaskAlt, "accept", Modifier.padding(8.dp))
+                    }
                 }
             }
         }
 
+
         val confirmedUsers = eventViewModel.confirmedUsers.value
 
-        Text(stringResource(id = R.string.confirmed_users) + " (${confirmedUsers.size}):", Modifier.padding(8.dp))
+        Text(
+            stringResource(id = R.string.confirmed_users) + " (${confirmedUsers.size}):",
+            Modifier.padding(8.dp)
+        )
 
         LazyColumn(
             Modifier
@@ -199,9 +236,11 @@ fun StartHour(event: Event, modifier: Modifier) {
     Text(
         text = buildAnnotatedString {
             append(stringResource(id = R.string.start_time) + ": ")
-            pushStyle(style = SpanStyle(
-                fontWeight = FontWeight.SemiBold
-            ))
+            pushStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
             append("${event.start.hour}:${event.start.minute.formatMinute()}")
         },
         modifier = Modifier

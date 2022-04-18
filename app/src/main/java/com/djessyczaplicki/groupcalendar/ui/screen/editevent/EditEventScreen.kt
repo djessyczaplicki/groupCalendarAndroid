@@ -3,12 +3,11 @@ package com.djessyczaplicki.groupcalendar.ui.screen.editevent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,7 +20,7 @@ import com.djessyczaplicki.groupcalendar.data.local.CustomColor
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.ColorPicker
 import com.djessyczaplicki.groupcalendar.ui.item.DatePickerPopup
-import com.djessyczaplicki.groupcalendar.ui.item.LabelledCheckbox
+import com.djessyczaplicki.groupcalendar.ui.item.LabelledSwitch
 import com.djessyczaplicki.groupcalendar.ui.item.TimePickerPopup
 import com.djessyczaplicki.groupcalendar.util.formatted
 import java.time.DayOfWeek
@@ -40,11 +39,11 @@ fun EditEventScreen(
     var description by rememberSaveable { mutableStateOf(event.description ?: "") }
     var color by remember { mutableStateOf(event.color.toComposeColor().value) }
     var startDate by rememberSaveable { mutableStateOf(event.start) }
-    var startHour by rememberSaveable { mutableStateOf(event.start.hour.toLong())}
-    var startMinute by rememberSaveable { mutableStateOf(event.start.minute.toLong())}
+    var startHour by rememberSaveable { mutableStateOf(event.start.hour.toLong()) }
+    var startMinute by rememberSaveable { mutableStateOf(event.start.minute.toLong()) }
     var startTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
-    var endHour by rememberSaveable { mutableStateOf(event.end.hour.toLong())}
-    var endMinute by rememberSaveable { mutableStateOf(event.end.minute.toLong())}
+    var endHour by rememberSaveable { mutableStateOf(event.end.hour.toLong()) }
+    var endMinute by rememberSaveable { mutableStateOf(event.end.minute.toLong()) }
     var endTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
     var isRecurrent by rememberSaveable { mutableStateOf(event.recurrenceId != null) }
     var daysExpanded by rememberSaveable { mutableStateOf(false) }
@@ -52,7 +51,9 @@ fun EditEventScreen(
     var requireConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        Modifier.verticalScroll(rememberScrollState())
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 10.dp)
     ) {
 
         Text(
@@ -67,7 +68,7 @@ fun EditEventScreen(
             value = name,
             onValueChange = { name = it },
             label = { Text(stringResource(id = R.string.name)) },
-            placeholder = { Text(stringResource(id = R.string.event_name))},
+            placeholder = { Text(stringResource(id = R.string.event_name)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
@@ -77,7 +78,7 @@ fun EditEventScreen(
             value = description,
             onValueChange = { description = it },
             label = { Text(stringResource(id = R.string.description)) },
-            placeholder = { Text(stringResource(id = R.string.event_description))},
+            placeholder = { Text(stringResource(id = R.string.event_description)) },
             singleLine = false,
             modifier = Modifier
                 .height(120.dp)
@@ -97,9 +98,9 @@ fun EditEventScreen(
             modifier = Modifier
                 .wrapContentHeight()
                 .height(60.dp)
-        ){
+        ) {
             if (!isRecurrent) {
-                DatePickerPopup (
+                DatePickerPopup(
                     modifier = Modifier
                         .padding(4.dp)
                         .weight(2f)
@@ -114,7 +115,6 @@ fun EditEventScreen(
                         .padding(4.dp)
                         .weight(2f),
                     onClick = { daysExpanded = !daysExpanded },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
                     Text(if (selectedDay == "") stringResource(id = R.string.select_week_day) else selectedDay)
                 }
@@ -126,13 +126,14 @@ fun EditEventScreen(
                 ) {
                     DayOfWeek.values().forEach { day ->
                         DropdownMenuItem(
+                            text = {
+                                Text(day.formatted())
+                            },
                             onClick = {
                                 selectedDay = day.formatted()
                                 daysExpanded = false
                             }
-                        ) {
-                            Text(day.formatted())
-                        }
+                        )
                     }
                 }
             }
@@ -186,7 +187,7 @@ fun EditEventScreen(
         }
 
         var isDialogOpen by remember { mutableStateOf(false) }
-        LabelledCheckbox(
+        LabelledSwitch(
             checked = isRecurrent,
             onCheckedChange = {
                 if (isEditing && isRecurrent && event.recurrenceId != null) {
@@ -224,7 +225,7 @@ fun EditEventScreen(
             )
         }
 
-        LabelledCheckbox(
+        LabelledSwitch(
             checked = requireConfirmation,
             onCheckedChange = { requireConfirmation = it },
             label = stringResource(R.string.require_confirmation)
@@ -232,92 +233,96 @@ fun EditEventScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (startTimeIsSet && endTimeIsSet && name.isNotBlank()) {
-            Button(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .height(60.dp)
-                    .align(Alignment.CenterHorizontally),
-                onClick = {
-                    if (!isRecurrent) {
-                        val startDateTime = startDate.withHour(startHour.toInt()).withMinute(startMinute.toInt())
-                        val endDateTime = startDate.withHour(endHour.toInt()).withMinute(endMinute.toInt())
-                        val newEvent = Event(
-                            name = name,
-                            description = description,
-                            color = CustomColor.from(color),
-                            start = startDateTime,
-                            end = endDateTime,
-                            requireConfirmation = requireConfirmation
-                        )
+        Button(
+            enabled = startTimeIsSet && endTimeIsSet && name.isNotBlank(),
+            modifier = Modifier
+                .padding(4.dp)
+                .height(60.dp)
+                .align(Alignment.CenterHorizontally),
+            onClick = {
+                if (!isRecurrent) {
+                    val startDateTime =
+                        startDate.withHour(startHour.toInt()).withMinute(startMinute.toInt())
+                    val endDateTime =
+                        startDate.withHour(endHour.toInt()).withMinute(endMinute.toInt())
+                    val newEvent = Event(
+                        name = name,
+                        description = description,
+                        color = CustomColor.from(color),
+                        start = startDateTime,
+                        end = endDateTime,
+                        requireConfirmation = requireConfirmation
+                    )
 
-                        if (isEditing) {
-                            val editedEvent = newEvent.also { it.id = event.id }
-                            editEventViewModel.editEvent(
-                                editedEvent = editedEvent
-                            ) {
-                                navController.popBackStack()
-                            }
-                        } else {
-                            editEventViewModel.createEvent(
-                                newEvent = newEvent
-                            ) {
-                                navController.popBackStack()
-                            }
+                    if (isEditing) {
+                        val editedEvent = newEvent.also { it.id = event.id }
+                        editEventViewModel.editEvent(
+                            editedEvent = editedEvent
+                        ) {
+                            navController.popBackStack()
                         }
-
                     } else {
-                        val dayOfWeek = DayOfWeek.values().find { it.formatted() == selectedDay }
-                        startDate = LocalDate.now().with(dayOfWeek).atStartOfDay()
+                        editEventViewModel.createEvent(
+                            newEvent = newEvent
+                        ) {
+                            navController.popBackStack()
+                        }
+                    }
 
-                        if (isEditing) {
-                            editEventViewModel.editRecurrentEvent(
-                                eventTemplate = Event(
+                } else {
+                    val dayOfWeek = DayOfWeek.values().find { it.formatted() == selectedDay }
+                    startDate = LocalDate.now().with(dayOfWeek).atStartOfDay()
+
+                    if (isEditing) {
+                        editEventViewModel.editRecurrentEvent(
+                            eventTemplate = Event(
+                                name = name,
+                                description = description,
+                                color = CustomColor.from(color),
+                                start = startDate.withHour(startHour.toInt())
+                                    .withMinute(startMinute.toInt()),
+                                end = startDate.withHour(endHour.toInt())
+                                    .withMinute(endMinute.toInt()),
+                                recurrenceId = event.recurrenceId,
+                                requireConfirmation = requireConfirmation
+                            )
+                        ) {
+                            navController.popBackStack()
+                        }
+                    } else {
+                        val recurrentId = UUID.randomUUID().toString()
+                        val newEvents = mutableListOf<Event>()
+                        for (i in 0 until 5) {
+                            val startDateTime =
+                                startDate.plusWeeks(i.toLong()).withHour(startHour.toInt())
+                                    .withMinute(startMinute.toInt())
+                            val endDateTime =
+                                startDate.plusWeeks(i.toLong()).withHour(endHour.toInt())
+                                    .withMinute(endMinute.toInt())
+                            newEvents.add(
+                                Event(
                                     name = name,
                                     description = description,
                                     color = CustomColor.from(color),
-                                    start = startDate.withHour(startHour.toInt())
-                                        .withMinute(startMinute.toInt()),
-                                    end = startDate.withHour(endHour.toInt())
-                                        .withMinute(endMinute.toInt()),
-                                    recurrenceId = event.recurrenceId,
+                                    start = startDateTime,
+                                    end = endDateTime,
+                                    recurrenceId = recurrentId,
                                     requireConfirmation = requireConfirmation
                                 )
-                            ) {
-                                navController.popBackStack()
-                            }
-                        } else {
-                            val recurrentId = UUID.randomUUID().toString()
-                            val newEvents = mutableListOf<Event>()
-                            for (i in 0 until 5) {
-                                val startDateTime = startDate.plusWeeks(i.toLong()).withHour(startHour.toInt())
-                                    .withMinute(startMinute.toInt())
-                                val endDateTime = startDate.plusWeeks(i.toLong()).withHour(endHour.toInt())
-                                    .withMinute(endMinute.toInt())
-                                newEvents.add(
-                                    Event(
-                                        name = name,
-                                        description = description,
-                                        color = CustomColor.from(color),
-                                        start = startDateTime,
-                                        end = endDateTime,
-                                        recurrenceId = recurrentId,
-                                        requireConfirmation = requireConfirmation
-                                    )
-                                )
-                            }
-                            editEventViewModel.createRecurrentEvent(newEvents) {
-                                navController.popBackStack()
-                            }
+                            )
+                        }
+                        editEventViewModel.createRecurrentEvent(newEvents) {
+                            navController.popBackStack()
                         }
                     }
                 }
-            ) {
-                Text(stringResource(id = if (isEditing) R.string.edit_event else R.string.create_event))
             }
+        ) {
+            Text(stringResource(id = if (isEditing) R.string.edit_event else R.string.create_event))
         }
-
     }
+
+
 }
 
 

@@ -1,19 +1,21 @@
 package com.djessyczaplicki.groupcalendar.ui.item
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
@@ -21,56 +23,69 @@ import java.time.format.DateTimeFormatter
 
 val EventTimeFormatter = DateTimeFormatter.ofPattern("H:mm")
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BasicEvent(
     event: Event,
     modifier: Modifier = Modifier,
+    fontSize: TextUnit = 10.sp,
     showDateOnEachEvent: Boolean = false,
     action: () -> Unit = {}
 ) {
-    Card(
-        elevation = 3.dp,
+    ElevatedCard(
         modifier = modifier
             .fillMaxSize()
             .padding(1.dp),
-        onClick = action
-    ){
-        Column(
-            modifier = modifier
-                .background(event.color.toComposeColor(), shape = RoundedCornerShape(4.dp))
-        ) {
-            val fontSize = 10.sp
-            if (showDateOnEachEvent)
-                Text(
-                    text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
-                    fontSize = fontSize,
-                    style = MaterialTheme.typography.caption
-                )
+        shape = RoundedCornerShape(4.dp),
+        onClick = action,
+        containerColor = event.color.toComposeColor()
+    ) {
+        val textColor =
+            if (event.color.toComposeColor()
+                    .luminance() < 0.5
+            ) Color.White else Color.Black
 
+        if (showDateOnEachEvent)
             Text(
-                modifier = Modifier.padding(2.dp),
-                text = event.name,
+                text = "${event.start.format(EventTimeFormatter)} - ${
+                    event.end.format(
+                        EventTimeFormatter
+                    )
+                }",
                 fontSize = fontSize,
-                style = MaterialTheme.typography.body1,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.bodySmall,
             )
 
-            if (event.description != null) {
-                Text(
-                    modifier = Modifier.padding(1.dp),
-                    text = event.description!!,
-                    fontSize = fontSize,
-                    style = MaterialTheme.typography.body2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+        Text(
+            modifier = Modifier.padding(2.dp),
+            text = event.name,
+            fontSize = fontSize,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold,
+            color = textColor
+        )
+
+        if (event.description != null) {
+            Text(
+                modifier = Modifier.padding(1.dp),
+                text = event.description!!,
+                fontSize = fontSize,
+                style = MaterialTheme.typography.bodySmall,
+                overflow = TextOverflow.Ellipsis,
+                color = textColor
+            )
         }
+
     }
 }
 
 @Preview
 @Composable
 fun BasicEventPreview() {
-    BasicEvent(event = Event(description = "Hola mundo, hoy vamos a comer ensalada con lechuga y tomate"))
+    BasicEvent(
+        event = Event(
+            name = "Juanito",
+            description = "Hola mundo, hoy vamos a comer ensalada con lechuga y tomate"
+        )
+    )
 }

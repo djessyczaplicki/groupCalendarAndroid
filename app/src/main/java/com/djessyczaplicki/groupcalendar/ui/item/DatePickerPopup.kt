@@ -1,27 +1,26 @@
 package com.djessyczaplicki.groupcalendar.ui.item
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.widget.DatePicker
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.djessyczaplicki.groupcalendar.R
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
-import com.djessyczaplicki.groupcalendar.R
 
 @Composable
 fun DatePickerPopup(
@@ -49,13 +48,13 @@ fun DatePickerPopup(
         }, mYear, mMonth, mDay
     )
     OutlinedButton(
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         modifier = modifier,
         onClick = {
             datePickerDialog.show()
         }
     ) {
-        Row{
+        Row {
             Text(text = if (date.value != "") date.value else stringResource(id = R.string.pick_a_date))
             Spacer(Modifier.width(5.dp))
             Icon(
@@ -63,7 +62,7 @@ fun DatePickerPopup(
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp, 20.dp),
-                tint = MaterialTheme.colors.onSurface
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

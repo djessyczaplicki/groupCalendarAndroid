@@ -2,21 +2,20 @@ package com.djessyczaplicki.groupcalendar.ui.screen.editgroup
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.StoreGroupImageUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.UpdateGroupUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
-import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
-import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUsersUseCase
+import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,10 +51,10 @@ class EditGroupViewModel @Inject constructor(
         }
     }
 
-    fun editGroup(editedGroup: Group, imageBitmap: Bitmap?, onSuccessCallback: () -> Unit) {
+    fun editGroup(editedGroup: Group, image: String, onSuccessCallback: () -> Unit) {
         isLoading = true
-        if (imageBitmap != null) {
-            storeGroupImageUseCase(editedGroup.id, imageBitmap) { imageUri ->
+        if (image.isNotEmpty() && !image.contains("https://firebasestorage.googleapis.com")) {
+            storeGroupImageUseCase(editedGroup.id, image) { imageUri ->
                 editedGroup.image = imageUri.toString()
                 updateGroup(editedGroup) {
                     onSuccessCallback()
@@ -70,9 +69,15 @@ class EditGroupViewModel @Inject constructor(
 
     private fun updateGroup(group: Group, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
+            val uid = Firebase.auth.currentUser!!.uid
+            if (!group.users.contains(uid)) {
+                group.users += uid
+            }
+            if (!group.admins.contains(uid)) {
+                group.admins += uid
+            }
             updateGroupUseCase(group)
             // add the group to creator/editor's groups
-            val uid = Firebase.auth.currentUser!!.uid
             val user = getUserByIdUseCase(uid) ?: throw Exception("User not found")
             if (!user.groups.contains(group.id)) {
                 user.groups += group.id
@@ -126,9 +131,13 @@ class EditGroupViewModel @Inject constructor(
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_TEXT, link)
 
-        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_group_invite)))
+        context.startActivity(
+            Intent.createChooser(
+                intent,
+                context.getString(R.string.share_group_invite)
+            )
+        )
     }
-
 
 
 }

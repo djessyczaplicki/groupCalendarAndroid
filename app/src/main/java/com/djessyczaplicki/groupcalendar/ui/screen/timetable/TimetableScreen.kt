@@ -2,28 +2,24 @@ package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
 import android.util.Log
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
@@ -43,10 +39,9 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import kotlin.math.roundToInt
 
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(
     navController: NavController,
@@ -62,9 +57,11 @@ fun TimetableScreen(
     var isDailyViewEnabled by rememberSaveable { mutableStateOf(false) }
     var page by rememberSaveable { mutableStateOf(startPage) }
     val pagerState = rememberPagerState()
-    ModalDrawer(
+    ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = gesturesEnabled,
+        drawerContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        drawerContainerColor = MaterialTheme.colorScheme.primaryContainer,
         drawerContent = {
             DrawerContent(
                 groups = groups.value,
@@ -89,12 +86,15 @@ fun TimetableScreen(
                 val scope = rememberCoroutineScope()
                 val groupNames = shownGroups.joinToString { it.name }
                 TopBar(
-                    title = resources.getQuantityString(R.plurals.timetable_title, shownGroups.size) + ": $groupNames",
+                    title = resources.getQuantityString(
+                        R.plurals.timetable_title,
+                        shownGroups.size
+                    ) + ": $groupNames",
                     navController = navController,
                     isDailyViewEnabled = isDailyViewEnabled,
                     onIconClicked = {
                         isDailyViewEnabled = !isDailyViewEnabled
-                        scope.launch{
+                        scope.launch {
                             // this method is used in order to compensate the gap between moving pages by days and by week,
                             // so when we swap from days to week or vice versa, the number of the actual page adapts
                             // ex isDailyViewEnabled = true:
@@ -103,7 +103,12 @@ fun TimetableScreen(
                             //      we are at page 490/1000, with startPage = 500 -> 486 - 500 = -14; -14 / 7 = -2; -2 + 500 = 498
                             pagerState.scrollToPage(
                                 if (isDailyViewEnabled)
-                                    max(min(((page - startPage) * daysToShow.toInt()) + startPage, numberOfPages), 0)
+                                    max(
+                                        min(
+                                            ((page - startPage) * daysToShow.toInt()) + startPage,
+                                            numberOfPages
+                                        ), 0
+                                    )
                                 else
                                     ((page - startPage).floorDiv(daysToShow.toInt())) + startPage
                             )
@@ -119,10 +124,10 @@ fun TimetableScreen(
             },
             content = {
                 val scrollState = rememberScrollState()
-                val heightPx = with(LocalDensity.current) { 64.dp.roundToPx()}
+                val heightPx = with(LocalDensity.current) { 64.dp.roundToPx() }
                 LaunchedEffect("key") { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
 
-                HorizontalPager(count = numberOfPages, state = pagerState ) { pageNum ->
+                HorizontalPager(count = numberOfPages, state = pagerState) { pageNum ->
                     TimetablePage(
                         navController = navController,
                         timetableViewModel = timetableViewModel,
@@ -137,7 +142,7 @@ fun TimetableScreen(
                     pagerState.scrollToPage(if (page == 0) startPage else page)
                 }
             },
-            floatingActionButton =  {
+            floatingActionButton = {
                 TimetableFAB(navController = navController, timetableViewModel = timetableViewModel)
             }
         )
@@ -163,8 +168,9 @@ fun TimetablePage(
     val events = timetableViewModel.events.value
     val eventsOfTheWeek = events.filter { event ->
         event.start.isAfter(firstDateOfWeek.atStartOfDay())
-        && event.end.isBefore(lastDateOfWeek.atStartOfDay())
+                && event.end.isBefore(lastDateOfWeek.atStartOfDay())
     }
+    val fontSize = max((20 - 2 * daysToShow).toInt(), 10).sp
     Column(
         Modifier
     ) {
@@ -174,7 +180,7 @@ fun TimetablePage(
             maxDate = lastDateOfWeek,
             eventContent = { event ->
                 val group = timetableViewModel.findParentGroup(event)
-                BasicEvent(event = event) {
+                BasicEvent(event = event, fontSize = fontSize) {
                     if (group != null) {
                         navController.navigate(AppScreens.EventScreen.route + "/${group.id}/${event.id}")
                     }
@@ -197,13 +203,13 @@ fun Schedule(
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
     minDate: LocalDate,
     maxDate: LocalDate,
-    scrollState: ScrollState
+    scrollState: ScrollState,
 ) {
     val days = ChronoUnit.DAYS.between(minDate, maxDate).toInt()
     val hourHeight = 64.dp
     var dayWidth by remember { mutableStateOf(0) }
     var sidebarWidth by remember { mutableStateOf(0) }
-    Column(modifier = modifier) {
+    Column(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
         ScheduleHeader(
             minDate = minDate,
             days = days,
@@ -235,85 +241,6 @@ fun Schedule(
     }
 }
 
-@Composable
-fun BasicSchedule(
-    events: List<Event>?,
-    modifier: Modifier = Modifier,
-    eventContent: @Composable (event: Event) -> Unit = { BasicEvent(event = it) },
-    minDate: LocalDate,
-    maxDate: LocalDate,
-    dayWidth: Dp,
-    hourHeight: Dp
-) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt()
-    val dividerColor = Color.LightGray
-    Layout(
-        content = {
-            events?.sortedBy(Event::start)?.forEach { event ->
-                Box(modifier = Modifier.eventData(event)) {
-                    eventContent(event)
-                }
-            }
-        },
-        modifier = modifier
-            .drawBehind {
-                repeat(23) {
-                    drawLine(
-                        dividerColor,
-                        start = Offset(0f, (it + 1) * hourHeight.toPx()),
-                        end = Offset(size.width, (it + 1) * hourHeight.toPx()),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-                repeat(numDays - 1) {
-                    drawLine(
-                        dividerColor,
-                        start = Offset((it + 1) * dayWidth.toPx(), 0f),
-                        end = Offset((it + 1) * dayWidth.toPx(), size.height),
-                        strokeWidth = 1.dp.toPx()
-                    )
-                }
-                val time = LocalTime.now()
-                drawLine(
-                    Color.Cyan,
-                    start = Offset(0f, time.hour * hourHeight.toPx() + time.minute * hourHeight.toPx() / 60),
-                    end = Offset(size.width, time.hour * hourHeight.toPx() + time.minute * hourHeight.toPx() / 60),
-                    strokeWidth = 3.dp.toPx()
-                )
-            }
-    ) { measurables, constraints ->
-        val height = hourHeight.roundToPx() * 24
-        val width = dayWidth.roundToPx() * numDays
-        val placeablesWithEvents = measurables.map { measurable ->
-            val event = measurable.parentData as Event
-            val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
-            val eventHeight = max(
-                ((eventDurationMinutes.div(60f)) * hourHeight.toPx()).roundToInt(),
-                50
-            )
-            val placeable = measurable.measure(
-                constraints.copy(
-                    minWidth = dayWidth.roundToPx(),
-                    maxWidth = dayWidth.roundToPx(),
-                    minHeight = eventHeight,
-                    maxHeight = eventHeight
-                )
-            )
-            Pair(placeable, event)
-        }
-        layout(width, height) {
-            placeablesWithEvents.forEach { (placeable, event) ->
-                val eventOffsetMinutes =
-                    ChronoUnit.MINUTES.between(LocalTime.MIN, event.start.toLocalTime())
-                val eventY = ((eventOffsetMinutes.div(60f)) * hourHeight.toPx()).roundToInt()
-                val eventOffsetDays =
-                    ChronoUnit.DAYS.between(minDate, event.start.toLocalDate()).toInt()
-                val eventX = eventOffsetDays * dayWidth.roundToPx()
-                placeable.place(eventX, eventY)
-            }
-        }
-    }
-}
 
 @Composable
 fun ScheduleHeader(
@@ -376,40 +303,47 @@ fun ScheduleSidebarPreview() {
     }
 }
 
-private fun Modifier.eventData(event: Event) = this.then(EventDataModifier(event))
-
-private class EventDataModifier(
-    val event: Event
-) : ParentDataModifier {
-    override fun Density.modifyParentData(parentData: Any?) = event
-}
 
 @Composable
-fun TimetableFAB(navController: NavController, timetableViewModel: TimetableViewModel) {
+fun TimetableFAB(
+    navController: NavController,
+    timetableViewModel: TimetableViewModel,
+) {
     var isDialogShown by remember { mutableStateOf(false) }
     val shownGroups = timetableViewModel.shownGroups.value
     FloatingActionButton(
         onClick = {
-            if (shownGroups.size == 1) navController.navigate(AppScreens.EditEventScreen.route
-                    + "/${shownGroups[0].id}")
+            if (shownGroups.size == 1) navController.navigate(
+                AppScreens.EditEventScreen.route
+                        + "/${shownGroups[0].id}"
+            )
             else
                 isDialogShown = true
         }) {
         Text("+")
     }
     if (isDialogShown) {
-        AlertDialog(
+        androidx.compose.material.AlertDialog(
+            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             onDismissRequest = { isDialogShown = false },
-            title = { Text (stringResource(id = R.string.select_a_group)) },
+            title = {
+                Text(
+                    stringResource(id = R.string.select_a_group),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            },
             buttons = {
                 LazyColumn {
                     items(shownGroups) { group ->
                         GroupRow(
                             onDestinationClicked = {
-                                navController.navigate(AppScreens.EditEventScreen.route
-                                        + "/${group.id}")
+                                navController.navigate(
+                                    AppScreens.EditEventScreen.route
+                                            + "/${group.id}"
+                                )
                             },
-                            group = group
+                            group = group,
                         )
                     }
                 }

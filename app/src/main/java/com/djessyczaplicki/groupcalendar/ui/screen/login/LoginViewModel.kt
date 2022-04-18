@@ -21,7 +21,6 @@ import com.djessyczaplicki.groupcalendar.domain.userusecase.GetUserByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.userusecase.UpdateUserUseCase
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.util.UserPreferences
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -76,6 +75,7 @@ class LoginViewModel @Inject constructor(
                         Log.w(TAG, "signInWithEmail:failure", task.exception)
                         onFailureCallback(task.exception?.message)
                     }
+                    isLoading.value = false
                 }
         }
     }
@@ -122,17 +122,6 @@ class LoginViewModel @Inject constructor(
             .requestIdToken(context.getString(R.string.web_client_id))
             .requestEmail()
             .build()
-        val signInRequest = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    // Your server's client ID, not your Android client ID.
-                    .setServerClientId(context.getString(R.string.web_client_id))
-                    // Only show accounts previously used to sign in.
-                    .setFilterByAuthorizedAccounts(true)
-                    .build()
-            )
-            .build();
 
 
 //        googleSignInClient.signOut()
@@ -247,6 +236,15 @@ class LoginViewModel @Inject constructor(
             navController.navigate(AppScreens.InviteScreen.route + "/$groupId") {
                 popUpTo(0)
             }
+        } else if (!intent.getStringExtra("event_id")
+                .isNullOrBlank() && !intent.getStringExtra("group_id").isNullOrBlank()
+        ) {
+            val groupId = intent.getStringExtra("group_id")!!
+            val eventId = intent.getStringExtra("event_id")!!
+            Log.d(TAG, "Group: $groupId, Event: $eventId")
+            navController.navigate(AppScreens.EventScreen.route + "/$groupId/$eventId") {
+                popUpTo(0)
+            }
         } else if (!intent.getStringExtra("group_id").isNullOrBlank()) {
             val groupId = intent.getStringExtra("group_id")!!
             Log.d(TAG, groupId)
@@ -266,7 +264,11 @@ class LoginViewModel @Inject constructor(
                     }
                 },
                 onFailureCallback = { message ->
-                    Toast.makeText(GroupCalendarApp.applicationContext(), message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        GroupCalendarApp.applicationContext(),
+                        message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             )
         }

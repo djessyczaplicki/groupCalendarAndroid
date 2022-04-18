@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,12 +30,21 @@ fun ColorPicker(
         colorResource(id = R.color.blue)
     )
 
+
+    var textColor by remember { mutableStateOf(Color.Black) }
+
+    fun updateTextColor() {
+        textColor = if (Color(value).luminance() > 0.5) Color.Black else Color.White
+    }
     OutlinedButton(
         modifier = modifier,
         onClick = { expanded = !expanded },
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color(value))
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(value),
+            contentColor = textColor
+        )
     ) {
-        Text(stringResource(id = R.string.color))
+        Text(stringResource(id = R.string.color), color = textColor)
     }
 
     DropdownMenu(
@@ -43,10 +53,15 @@ fun ColorPicker(
         modifier = modifier
     ) {
         colors.forEach { color ->
-            DropdownMenuItem(onClick = { onValueChange(color.value); expanded = false }, modifier = Modifier.background(color = color)) { }
+            DropdownMenuItem(
+                onClick = { onValueChange(color.value); updateTextColor(); expanded = false },
+                modifier = Modifier.background(color = color)
+            ) { }
         }
     }
+
 }
+
 
 @Preview(showBackground = true)
 @Composable

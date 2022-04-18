@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +22,7 @@ fun BasicSidebarLabel(
     modifier: Modifier = Modifier
 ) {
     Text(
+        color = MaterialTheme.colorScheme.onBackground,
         text = time.format(HourFormatter),
         fontSize = 10.sp,
         modifier = modifier
@@ -31,7 +33,7 @@ fun BasicSidebarLabel(
 
 @Preview(showBackground = true)
 @Composable
-fun BasicSidebarLabelPreview(){
+fun BasicSidebarLabelPreview() {
     GroupCalendarTheme {
         BasicSidebarLabel(time = LocalTime.NOON, Modifier.sizeIn(maxHeight = 64.dp))
     }
