@@ -5,6 +5,7 @@ import com.djessyczaplicki.groupcalendar.data.network.ApiClient
 import com.djessyczaplicki.groupcalendar.data.network.NotificationApi
 import com.djessyczaplicki.groupcalendar.util.Constants
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,11 +37,12 @@ object AppModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient
     ): Retrofit {
-
+        val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
+        
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
@@ -55,7 +57,6 @@ object AppModule {
     fun provideNotificationApi(retrofit: Retrofit): NotificationApi {
         return retrofit.create(NotificationApi::class.java)
     }
-
 
 
 }

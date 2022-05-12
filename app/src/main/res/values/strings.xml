@@ -99,12 +99,12 @@
     <string name="text">Text</string>
     <string name="send_a_message_to_group">Send a notification to all the members of the actual group</string>
     <string name="notification_sent">Notification sent</string>
-    <string name="error_sending_notification">An error occured while trying to send the notification</string>
+    <string name="error_sending_notification">An error occurred while trying to send the notification</string>
     <string name="default_notification_channel_id" translatable="false">groupcalendargeneralchannel</string>
     <string name="default_notification_channel_name">General</string>
     <string name="default_notification_channel_description">Group Calendar general notifications</string>
     <string name="alarm_set_successfully">Alarm set successfully</string>
     <string name="this_event_requires_confirmation">This event requires confirmation from the members</string>
-    <string name="deny_attendance">Deny attendance:</string>
+    <string name="deny_attendance">Cancel attendance:</string>
 
 </resources>

@@ -47,8 +47,8 @@ fun BasicEvent(
 
         if (showDateOnEachEvent)
             Text(
-                text = "${event.start.format(EventTimeFormatter)} - ${
-                    event.end.format(
+                text = "${event.localStart.format(EventTimeFormatter)} - ${
+                    event.localEnd.format(
                         EventTimeFormatter
                     )
                 }",

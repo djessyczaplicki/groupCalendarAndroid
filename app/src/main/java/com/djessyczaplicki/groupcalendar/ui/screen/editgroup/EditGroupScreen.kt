@@ -187,7 +187,10 @@ fun EditGroupScreen(
                             }
                         }
                     }) {
-                    Text(stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group))
+                    Text(
+                        stringResource(id = if (isEditing) R.string.edit_group_screen else R.string.create_group),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
                 if (isEditing) {
                     Button(

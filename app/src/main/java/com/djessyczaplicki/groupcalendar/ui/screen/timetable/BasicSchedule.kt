@@ -45,7 +45,7 @@ fun BasicSchedule(
     val dividerColor = Color.LightGray
     Layout(
         content = {
-            events?.sortedBy(Event::start)?.forEach { event ->
+            events?.sortedBy(Event::localStart)?.forEach { event ->
                 Box(modifier = Modifier.eventData(event)) {
                     eventContent(event)
                 }
@@ -88,7 +88,7 @@ fun BasicSchedule(
         val width = dayWidth.roundToPx() * numDays
         val placeablesWithEvents = measurables.map { measurable ->
             val event = measurable.parentData as Event
-            val eventDurationMinutes = ChronoUnit.MINUTES.between(event.start, event.end)
+            val eventDurationMinutes = ChronoUnit.MINUTES.between(event.localStart, event.localEnd)
             val eventHeight = Integer.max(
                 ((eventDurationMinutes.div(60f)) * hourHeight.toPx()).roundToInt(),
                 50
@@ -106,10 +106,10 @@ fun BasicSchedule(
         layout(width, height) {
             placeablesWithEvents.forEach { (placeable, event) ->
                 val eventOffsetMinutes =
-                    ChronoUnit.MINUTES.between(LocalTime.MIN, event.start.toLocalTime())
+                    ChronoUnit.MINUTES.between(LocalTime.MIN, event.localStart.toLocalTime())
                 val eventY = ((eventOffsetMinutes.div(60f)) * hourHeight.toPx()).roundToInt()
                 val eventOffsetDays =
-                    ChronoUnit.DAYS.between(minDate, event.start.toLocalDate()).toInt()
+                    ChronoUnit.DAYS.between(minDate, event.localStart.toLocalDate()).toInt()
                 val eventX = eventOffsetDays * dayWidth.roundToPx()
                 placeable.place(eventX, eventY)
             }

@@ -15,7 +15,7 @@ import javax.inject.Inject
 class EditEventViewModel @Inject constructor(
     private val updateGroupEventsUseCase: UpdateGroupEventsUseCase,
     private val getGroupByIdUseCase: GetGroupByIdUseCase
-): ViewModel() {
+) : ViewModel() {
     lateinit var groupId: String
     lateinit var eventId: String
 
@@ -28,7 +28,7 @@ class EditEventViewModel @Inject constructor(
         this.eventId = eventId
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId) ?: return@launch
-            event.value = group.value.events.find{ it.id == eventId } ?: Event()
+            event.value = group.value.events.find { it.id == eventId } ?: Event()
         }
     }
 
@@ -59,7 +59,7 @@ class EditEventViewModel @Inject constructor(
     fun editEvent(editedEvent: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)!!
-            val event = group.value.events.find{ it.id == eventId } ?: Event()
+            val event = group.value.events.find { it.id == eventId } ?: Event()
             overwriteEventData(event, editedEvent)
             updateGroupEventsUseCase(group.value)
             onSuccessCallback()
@@ -75,16 +75,16 @@ class EditEventViewModel @Inject constructor(
         event.description = editedEvent.description
         event.color = editedEvent.color
         event.recurrenceId = editedEvent.recurrenceId
-        event.start = editedEvent.start
+        event.localStart = editedEvent.localStart
         event.requireConfirmation = editedEvent.requireConfirmation
-        event.end = editedEvent.end
+        event.localEnd = editedEvent.localEnd
     }
 
     fun editRecurrentEvent(eventTemplate: Event, onSuccessCallback: () -> Unit) {
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId)!!
             val allEvents = group.value.events
-            val recurrentEvents = allEvents.filter{ recurrentEvent ->
+            val recurrentEvents = allEvents.filter { recurrentEvent ->
                 recurrentEvent.recurrenceId == eventTemplate.recurrenceId
             }
             recurrentEvents.forEach { event ->
@@ -99,12 +99,14 @@ class EditEventViewModel @Inject constructor(
         event: Event,
         eventTemplate: Event
     ) {
-        event.start =
-            event.start.with(eventTemplate.start.dayOfWeek).withHour(eventTemplate.start.hour)
-                .withMinute(eventTemplate.start.minute)
-        event.end =
-            event.end.with(eventTemplate.end.dayOfWeek).withHour(eventTemplate.end.hour)
-                .withMinute(eventTemplate.end.minute)
+        event.localStart =
+            event.localStart.with(eventTemplate.localStart.dayOfWeek)
+                .withHour(eventTemplate.localStart.hour)
+                .withMinute(eventTemplate.localStart.minute)
+        event.localEnd =
+            event.localEnd.with(eventTemplate.localEnd.dayOfWeek)
+                .withHour(eventTemplate.localEnd.hour)
+                .withMinute(eventTemplate.localEnd.minute)
         event.color = eventTemplate.color
         event.name = eventTemplate.name
         event.requireConfirmation = eventTemplate.requireConfirmation

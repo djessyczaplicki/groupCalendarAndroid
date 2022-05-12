@@ -35,8 +35,8 @@ fun DrawerContent(
     navController: NavController,
     onDestinationClicked: (route: String) -> Unit
 ) {
-    LazyColumn(
-    ) {
+    LazyColumn()
+    {
         item {
             Spacer(Modifier.height(5.dp))
             val usersGroupIds = groups.joinToString(",") { it.id }

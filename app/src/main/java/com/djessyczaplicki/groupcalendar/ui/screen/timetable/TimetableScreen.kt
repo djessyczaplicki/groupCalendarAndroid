@@ -167,8 +167,8 @@ fun TimetablePage(
     val lastDateOfWeek = firstDateOfWeek.plusDays(daysToShow)
     val events = timetableViewModel.events.value
     val eventsOfTheWeek = events.filter { event ->
-        event.start.isAfter(firstDateOfWeek.atStartOfDay())
-                && event.end.isBefore(lastDateOfWeek.atStartOfDay())
+        event.localStart.isAfter(firstDateOfWeek.atStartOfDay())
+                && event.localEnd.isBefore(lastDateOfWeek.atStartOfDay())
     }
     val fontSize = max((20 - 2 * daysToShow).toInt(), 10).sp
     Column(

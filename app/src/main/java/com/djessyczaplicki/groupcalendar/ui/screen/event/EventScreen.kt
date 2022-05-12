@@ -138,7 +138,7 @@ fun EventScreenContent(
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
-                        append("${event.start.dayOfWeek.formatted()}, ${event.start.dayOfMonth}/${event.start.monthValue}/${event.start.year}")
+                        append("${event.localStart.dayOfWeek.formatted()}, ${event.localStart.dayOfMonth}/${event.localStart.monthValue}/${event.localStart.year}")
                     },
                     modifier = Modifier.padding(4.dp)
                 )
@@ -241,7 +241,7 @@ fun StartHour(event: Event, modifier: Modifier) {
                     fontWeight = FontWeight.SemiBold
                 )
             )
-            append("${event.start.hour}:${event.start.minute.formatMinute()}")
+            append("${event.localStart.hour}:${event.localStart.minute.formatMinute()}")
         },
         modifier = Modifier
             .padding(4.dp)
@@ -258,7 +258,7 @@ fun EndHour(event: Event, modifier: Modifier) {
                     fontWeight = FontWeight.SemiBold
                 )
             )
-            append("${event.end.hour}:${event.end.minute.formatMinute()}")
+            append("${event.localEnd.hour}:${event.localEnd.minute.formatMinute()}")
         },
         modifier = modifier
             .padding(4.dp)

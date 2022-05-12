@@ -116,7 +116,7 @@ class EventViewModel @Inject constructor(
 
         calendar.time =
             Date.from(
-                event.value.start.minusMinutes(minutes.toLong()).toInstant(ZoneOffset.ofHours(2))
+                event.value.localStart.minusMinutes(minutes.toLong()).toInstant(ZoneOffset.ofHours(2))
             )
         alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,

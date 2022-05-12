@@ -63,6 +63,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadToken()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

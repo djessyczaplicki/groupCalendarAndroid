@@ -38,16 +38,16 @@ fun EditEventScreen(
     var name by rememberSaveable { mutableStateOf(event.name) }
     var description by rememberSaveable { mutableStateOf(event.description ?: "") }
     var color by remember { mutableStateOf(event.color.toComposeColor().value) }
-    var startDate by rememberSaveable { mutableStateOf(event.start) }
-    var startHour by rememberSaveable { mutableStateOf(event.start.hour.toLong()) }
-    var startMinute by rememberSaveable { mutableStateOf(event.start.minute.toLong()) }
+    var startDate by rememberSaveable { mutableStateOf(event.localStart) }
+    var startHour by rememberSaveable { mutableStateOf(event.localStart.hour.toLong()) }
+    var startMinute by rememberSaveable { mutableStateOf(event.localStart.minute.toLong()) }
     var startTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
-    var endHour by rememberSaveable { mutableStateOf(event.end.hour.toLong()) }
-    var endMinute by rememberSaveable { mutableStateOf(event.end.minute.toLong()) }
+    var endHour by rememberSaveable { mutableStateOf(event.localEnd.hour.toLong()) }
+    var endMinute by rememberSaveable { mutableStateOf(event.localEnd.minute.toLong()) }
     var endTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
     var isRecurrent by rememberSaveable { mutableStateOf(event.recurrenceId != null) }
     var daysExpanded by rememberSaveable { mutableStateOf(false) }
-    var selectedDay by rememberSaveable { mutableStateOf(event.start.dayOfWeek.formatted()) }
+    var selectedDay by rememberSaveable { mutableStateOf(event.localStart.dayOfWeek.formatted()) }
     var requireConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -249,10 +249,10 @@ fun EditEventScreen(
                         name = name,
                         description = description,
                         color = CustomColor.from(color),
-                        start = startDateTime,
-                        end = endDateTime,
                         requireConfirmation = requireConfirmation
                     )
+                    newEvent.localStart = startDateTime
+                    newEvent.localEnd = endDateTime
 
                     if (isEditing) {
                         val editedEvent = newEvent.also { it.id = event.id }
@@ -274,18 +274,20 @@ fun EditEventScreen(
                     startDate = LocalDate.now().with(dayOfWeek).atStartOfDay()
 
                     if (isEditing) {
+                        val eventTemplate = Event(
+                            name = name,
+                            description = description,
+                            color = CustomColor.from(color),
+                            recurrenceId = event.recurrenceId,
+                            requireConfirmation = requireConfirmation
+                        )
+                        eventTemplate.localStart = startDate.withHour(startHour.toInt())
+                            .withMinute(startMinute.toInt())
+                        eventTemplate.localEnd = startDate.withHour(endHour.toInt())
+                            .withMinute(endMinute.toInt())
+
                         editEventViewModel.editRecurrentEvent(
-                            eventTemplate = Event(
-                                name = name,
-                                description = description,
-                                color = CustomColor.from(color),
-                                start = startDate.withHour(startHour.toInt())
-                                    .withMinute(startMinute.toInt()),
-                                end = startDate.withHour(endHour.toInt())
-                                    .withMinute(endMinute.toInt()),
-                                recurrenceId = event.recurrenceId,
-                                requireConfirmation = requireConfirmation
-                            )
+                            eventTemplate = eventTemplate
                         ) {
                             navController.popBackStack()
                         }
@@ -299,16 +301,18 @@ fun EditEventScreen(
                             val endDateTime =
                                 startDate.plusWeeks(i.toLong()).withHour(endHour.toInt())
                                     .withMinute(endMinute.toInt())
+                            val newEvent = Event(
+                                name = name,
+                                description = description,
+                                color = CustomColor.from(color),
+                                recurrenceId = recurrentId,
+                                requireConfirmation = requireConfirmation
+                            )
+                            newEvent.localStart = startDateTime
+                            newEvent.localEnd = endDateTime
+                            
                             newEvents.add(
-                                Event(
-                                    name = name,
-                                    description = description,
-                                    color = CustomColor.from(color),
-                                    start = startDateTime,
-                                    end = endDateTime,
-                                    recurrenceId = recurrentId,
-                                    requireConfirmation = requireConfirmation
-                                )
+                                newEvent
                             )
                         }
                         editEventViewModel.createRecurrentEvent(newEvents) {
