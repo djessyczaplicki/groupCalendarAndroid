@@ -69,10 +69,10 @@ fun EventScreen(
                 ) Color.Black else Color.White
             )
         },
-        content = {
+        content = { padding ->
             EventScreenContent(
-                navController = navController,
-                eventViewModel = eventViewModel
+                eventViewModel = eventViewModel,
+                modifier = Modifier.padding(top = padding.calculateTopPadding())
             )
         },
         floatingActionButton = {
@@ -88,12 +88,12 @@ fun EventScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventScreenContent(
-    navController: NavController,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    modifier: Modifier = Modifier
 ) {
     val event = eventViewModel.event.value
     Column(
-        Modifier.verticalScroll(rememberScrollState())
+        modifier.verticalScroll(rememberScrollState())
     ) {
         if (!event.description.isNullOrBlank()) {
             Row(

@@ -66,7 +66,7 @@ fun EditGroupScreen(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 10.dp)
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp)
         ) {
 
             Text(

@@ -1,5 +1,6 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.editevent
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,16 +18,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.local.CustomColor
+import com.djessyczaplicki.groupcalendar.data.local.WeekDayCheck
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.ColorPicker
 import com.djessyczaplicki.groupcalendar.ui.item.DatePickerPopup
 import com.djessyczaplicki.groupcalendar.ui.item.LabelledSwitch
 import com.djessyczaplicki.groupcalendar.ui.item.TimePickerPopup
-import com.djessyczaplicki.groupcalendar.util.formatted
-import java.time.DayOfWeek
-import java.time.LocalDate
+import com.google.accompanist.flowlayout.FlowRow
+import java.time.LocalDateTime
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditEventScreen(
     navController: NavController,
@@ -35,6 +37,7 @@ fun EditEventScreen(
     val isEditing = editEventViewModel.isEditing.value
     val group = editEventViewModel.group.value
     val event = editEventViewModel.event.value
+    val days = editEventViewModel.days
     var name by rememberSaveable { mutableStateOf(event.name) }
     var description by rememberSaveable { mutableStateOf(event.description ?: "") }
     var color by remember { mutableStateOf(event.color.toComposeColor().value) }
@@ -46,8 +49,7 @@ fun EditEventScreen(
     var endMinute by rememberSaveable { mutableStateOf(event.localEnd.minute.toLong()) }
     var endTimeIsSet by rememberSaveable { mutableStateOf(isEditing) }
     var isRecurrent by rememberSaveable { mutableStateOf(event.recurrenceId != null) }
-    var daysExpanded by rememberSaveable { mutableStateOf(false) }
-    var selectedDay by rememberSaveable { mutableStateOf(event.localStart.dayOfWeek.formatted()) }
+    var lastDate by rememberSaveable { mutableStateOf(event.localStart) }
     var requireConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -94,49 +96,22 @@ fun EditEventScreen(
                 .padding(4.dp)
         )
 
-        Row(
+        FlowRow(
             modifier = Modifier
                 .wrapContentHeight()
-                .height(60.dp)
+                .height(100.dp)
         ) {
-            if (!isRecurrent) {
-                DatePickerPopup(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .weight(2f)
-                        .fillMaxHeight()
-                ) {
-                    startDate = it.atStartOfDay()
-                }
-            } else {
-                OutlinedButton(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(4.dp)
-                        .weight(2f),
-                    onClick = { daysExpanded = !daysExpanded },
-                ) {
-                    Text(if (selectedDay == "") stringResource(id = R.string.select_week_day) else selectedDay)
-                }
-
-                DropdownMenu(
-                    expanded = daysExpanded,
-                    onDismissRequest = { daysExpanded = false },
-                    modifier = Modifier
-                ) {
-                    DayOfWeek.values().forEach { day ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(day.formatted())
-                            },
-                            onClick = {
-                                selectedDay = day.formatted()
-                                daysExpanded = false
-                            }
-                        )
-                    }
-                }
+            DatePickerPopup(
+                defaultText = if (isRecurrent) stringResource(R.string.pick_start_date)
+                else stringResource(R.string.pick_a_date),
+                modifier = Modifier
+                    .padding(4.dp)
+                    .weight(2f)
+                    .fillMaxHeight()
+            ) {
+                startDate = it.atStartOfDay()
             }
+
 
             TimePickerPopup(
                 text = stringResource(id = R.string.start_time),
@@ -147,7 +122,6 @@ fun EditEventScreen(
                     .padding(4.dp)
                     .weight(1f)
                     .fillMaxHeight()
-
             ) { hour, minute ->
                 startHour = hour
                 startMinute = minute
@@ -184,8 +158,43 @@ fun EditEventScreen(
                     startMinute = endMinute
                 }
             }
+            AnimatedVisibility(visible = isRecurrent) {
+                DatePickerPopup(
+                    defaultText = stringResource(id = R.string.pick_end_date),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .weight(2f)
+                        .fillMaxHeight()
+                ) {
+                    lastDate = it.plusDays(1).atStartOfDay()
+                }
+            }
         }
 
+
+        AnimatedVisibility(visible = isRecurrent) {
+            FlowRow(
+                Modifier
+                    .padding(4.dp)
+                    .height(100.dp)
+            ) {
+                days.forEach { day ->
+                    FilterChip(
+                        selected = day.isChecked,
+                        onClick = {
+                            days[days.indexOf(day)] =
+                                days[days.indexOf(day)].copy(isChecked = !day.isChecked)
+                        },
+                        label = {
+                            Text(day.day)
+                        }
+                    )
+                    Spacer(
+                        Modifier.padding(4.dp)
+                    )
+                }
+            }
+        }
         var isDialogOpen by remember { mutableStateOf(false) }
         LabelledSwitch(
             checked = isRecurrent,
@@ -234,7 +243,9 @@ fun EditEventScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            enabled = startTimeIsSet && endTimeIsSet && name.isNotBlank(),
+            enabled = startTimeIsSet && endTimeIsSet && name.isNotBlank() && ((lastDate > startDate && days.any(
+                WeekDayCheck::isChecked
+            )) || !isRecurrent),
             modifier = Modifier
                 .padding(4.dp)
                 .height(60.dp)
@@ -270,8 +281,6 @@ fun EditEventScreen(
                     }
 
                 } else {
-                    val dayOfWeek = DayOfWeek.values().find { it.formatted() == selectedDay }
-                    startDate = LocalDate.now().with(dayOfWeek).atStartOfDay()
 
                     if (isEditing) {
                         val eventTemplate = Event(
@@ -294,26 +303,30 @@ fun EditEventScreen(
                     } else {
                         val recurrentId = UUID.randomUUID().toString()
                         val newEvents = mutableListOf<Event>()
-                        for (i in 0 until 5) {
-                            val startDateTime =
-                                startDate.plusWeeks(i.toLong()).withHour(startHour.toInt())
-                                    .withMinute(startMinute.toInt())
-                            val endDateTime =
-                                startDate.plusWeeks(i.toLong()).withHour(endHour.toInt())
-                                    .withMinute(endMinute.toInt())
-                            val newEvent = Event(
-                                name = name,
-                                description = description,
-                                color = CustomColor.from(color),
-                                recurrenceId = recurrentId,
-                                requireConfirmation = requireConfirmation
-                            )
-                            newEvent.localStart = startDateTime
-                            newEvent.localEnd = endDateTime
-                            
-                            newEvents.add(
-                                newEvent
-                            )
+                        var actualDay = LocalDateTime.from(startDate)
+                        while (actualDay < lastDate) {
+                            if (days.find { day -> day.dayOfWeek == actualDay.dayOfWeek }!!.isChecked) {
+                                val startDateTime =
+                                    actualDay.withHour(startHour.toInt())
+                                        .withMinute(startMinute.toInt())
+                                val endDateTime =
+                                    actualDay.withHour(endHour.toInt())
+                                        .withMinute(endMinute.toInt())
+                                val newEvent = Event(
+                                    name = name,
+                                    description = description,
+                                    color = CustomColor.from(color),
+                                    recurrenceId = recurrentId,
+                                    requireConfirmation = requireConfirmation,
+                                )
+                                newEvent.localStart = startDateTime
+                                newEvent.localEnd = endDateTime
+
+                                newEvents.add(
+                                    newEvent
+                                )
+                            }
+                            actualDay = actualDay.plusDays(1)
                         }
                         editEventViewModel.createRecurrentEvent(newEvents) {
                             navController.popBackStack()

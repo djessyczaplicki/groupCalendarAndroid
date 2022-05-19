@@ -83,7 +83,6 @@ fun TimetableScreen(
             topBar = {
                 val resources = LocalContext.current.resources
                 val shownGroups = timetableViewModel.shownGroups.value
-                val scope = rememberCoroutineScope()
                 val groupNames = shownGroups.joinToString { it.name }
                 TopBar(
                     title = resources.getQuantityString(
@@ -122,12 +121,16 @@ fun TimetableScreen(
                     }
                 )
             },
-            content = {
+            content = { padding ->
                 val scrollState = rememberScrollState()
                 val heightPx = with(LocalDensity.current) { 64.dp.roundToPx() }
                 LaunchedEffect("key") { scrollState.animateScrollTo(LocalTime.now().hour * heightPx) }
 
-                HorizontalPager(count = numberOfPages, state = pagerState) { pageNum ->
+                HorizontalPager(
+                    count = numberOfPages,
+                    state = pagerState,
+                    modifier = Modifier.padding(top = padding.calculateTopPadding())
+                ) { pageNum ->
                     TimetablePage(
                         navController = navController,
                         timetableViewModel = timetableViewModel,

@@ -25,6 +25,7 @@ import java.util.*
 @Composable
 fun DatePickerPopup(
     modifier: Modifier = Modifier,
+    defaultText: String = stringResource(id = R.string.pick_a_date),
     onSelection: (LocalDate) -> Unit
 ) {
     val context = LocalContext.current
@@ -48,14 +49,17 @@ fun DatePickerPopup(
         }, mYear, mMonth, mDay
     )
     OutlinedButton(
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
         modifier = modifier,
         onClick = {
             datePickerDialog.show()
         }
     ) {
         Row {
-            Text(text = if (date.value != "") date.value else stringResource(id = R.string.pick_a_date))
+            Text(text = if (date.value != "") date.value else defaultText)
             Spacer(Modifier.width(5.dp))
             Icon(
                 imageVector = Icons.Default.DateRange,

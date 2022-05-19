@@ -1,14 +1,17 @@
 package com.djessyczaplicki.groupcalendar.ui.screen.editevent
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.djessyczaplicki.groupcalendar.data.local.WeekDayCheck
 import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.domain.eventusecase.UpdateGroupEventsUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,9 +22,13 @@ class EditEventViewModel @Inject constructor(
     lateinit var groupId: String
     lateinit var eventId: String
 
+    private val mDays = DayOfWeek.values().map { day ->
+        WeekDayCheck(day)
+    }
     val group = mutableStateOf(Group())
     val event = mutableStateOf(Event())
     val isEditing = mutableStateOf(false)
+    val days = mutableStateListOf<WeekDayCheck>()
 
     fun loadEvent(groupId: String, eventId: String) {
         this.groupId = groupId
@@ -33,6 +40,8 @@ class EditEventViewModel @Inject constructor(
     }
 
     fun loadGroup() {
+        days.clear()
+        days.addAll(mDays)
         viewModelScope.launch {
             group.value = getGroupByIdUseCase(groupId) ?: return@launch
         }

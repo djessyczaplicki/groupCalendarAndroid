@@ -103,5 +103,7 @@
     <string name="alarm_set_successfully">Alarma establecida</string>
     <string name="this_event_requires_confirmation">Este evento requiere la confirmación de los participantes</string>
     <string name="deny_attendance">Cancelar asistencia:</string>
+    <string name="pick_start_date">Elige una fecha de inicio</string>
+    <string name="pick_end_date">Elige un fecha de fin</string>
 
 </resources>

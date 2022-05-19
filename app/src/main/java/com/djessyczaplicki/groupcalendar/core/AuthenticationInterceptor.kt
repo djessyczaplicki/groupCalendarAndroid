@@ -11,11 +11,11 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthenticationInterceptor @Inject constructor() : Interceptor {
-    private val TAG = "AuthenticationIntcptr."
+    private val TAG = "AuthInterceptor"
     private var authToken: String? = null
 
     fun setSessionToken(authToken: String) {
-        Log.d(TAG,"My new token is: $authToken")
+        Log.d(TAG, "My new token is: $authToken")
         this.authToken = authToken
     }
 

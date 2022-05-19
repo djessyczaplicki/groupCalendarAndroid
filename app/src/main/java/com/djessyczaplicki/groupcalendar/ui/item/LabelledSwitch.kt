@@ -21,7 +21,7 @@ fun LabelledSwitch(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
-            .height(48.dp)
+            .height(54.dp)
             .padding(4.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

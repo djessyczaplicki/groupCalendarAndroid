@@ -106,5 +106,6 @@
     <string name="alarm_set_successfully">Alarm set successfully</string>
     <string name="this_event_requires_confirmation">This event requires confirmation from the members</string>
     <string name="deny_attendance">Cancel attendance:</string>
-
+    <string name="pick_start_date">Pick a start date</string>
+    <string name="pick_end_date">Pick an end date</string>
 </resources>
