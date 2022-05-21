@@ -46,11 +46,17 @@ class Repository @Inject constructor(
         return response.body()!!
     }
 
+    suspend fun deleteGroupById(id: String) {
+        val response = api.deleteGroup(id)
+        Log.i(TAG, response.toString())
+    }
+
     suspend fun sendNotification(pushNotification: PushNotification): FCMTopicBody? {
         val response = notificationApi.postNotification(pushNotification)
         Log.i(TAG, response.toString())
         return response.body()
     }
+
 
 //    suspend fun createGroup(group: Group): Group {
 //        val response = RetrofitHelper.getApiClient().createGroup(group, group.id)

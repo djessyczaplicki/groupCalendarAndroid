@@ -4,10 +4,7 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 
 
 interface ApiClient {
@@ -42,6 +39,11 @@ interface ApiClient {
         @Body user: User,
         @Path("userId") userId: String
     ): Response<User>
+
+    @DELETE("/groups/{groupId}.json")
+    suspend fun deleteGroup(
+        @Path("groupId") groupId: String
+    ): Response<Any>
 
 //    @POST("/groups/{groupId}")
 //    suspend fun createGroup(

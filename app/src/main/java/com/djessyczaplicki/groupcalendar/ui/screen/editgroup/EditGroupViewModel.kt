@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.djessyczaplicki.groupcalendar.R
 import com.djessyczaplicki.groupcalendar.data.remote.model.Group
 import com.djessyczaplicki.groupcalendar.data.remote.model.User
+import com.djessyczaplicki.groupcalendar.domain.groupusecase.DeleteGroupUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.GetGroupByIdUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.StoreGroupImageUseCase
 import com.djessyczaplicki.groupcalendar.domain.groupusecase.UpdateGroupUseCase
@@ -29,7 +30,8 @@ class EditGroupViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
-    private val storeGroupImageUseCase: StoreGroupImageUseCase
+    private val storeGroupImageUseCase: StoreGroupImageUseCase,
+    private val deleteGroupUseCase: DeleteGroupUseCase
 ) : ViewModel() {
     var groupId: String? = null
 
@@ -137,6 +139,13 @@ class EditGroupViewModel @Inject constructor(
                 context.getString(R.string.share_group_invite)
             )
         )
+    }
+
+    fun deleteGroup(onSuccessCallback: () -> Unit) {
+        viewModelScope.launch {
+            deleteGroupUseCase(groupId!!)
+            onSuccessCallback()
+        }
     }
 
 

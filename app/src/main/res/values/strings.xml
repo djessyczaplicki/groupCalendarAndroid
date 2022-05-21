@@ -108,4 +108,7 @@
     <string name="deny_attendance">Cancel attendance:</string>
     <string name="pick_start_date">Pick a start date</string>
     <string name="pick_end_date">Pick an end date</string>
+    <string name="save_changes">Save changes</string>
+    <string name="delete_group">Delete group?</string>
+    <string name="delete_group_text">Are you sure you want to delete the group \"{0}\"?</string>
 </resources>

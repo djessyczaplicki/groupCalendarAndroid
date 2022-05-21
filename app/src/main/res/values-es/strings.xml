@@ -105,5 +105,7 @@
     <string name="deny_attendance">Cancelar asistencia:</string>
     <string name="pick_start_date">Elige una fecha de inicio</string>
     <string name="pick_end_date">Elige un fecha de fin</string>
-
+    <string name="save_changes">Guardar cambios</string>
+    <string name="delete_group">¿Eliminar grupo?</string>
+    <string name="delete_group_text">¿Estás seguro de querer eliminar el grupo \"{0}\"?</string>
 </resources>

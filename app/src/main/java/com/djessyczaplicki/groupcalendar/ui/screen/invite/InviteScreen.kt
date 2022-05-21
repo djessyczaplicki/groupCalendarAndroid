@@ -114,7 +114,11 @@ fun getGroupInviteText(group: Group): AnnotatedString {
         withStyle(
             style = SpanStyle(fontWeight = FontWeight.Bold)
         ) {
-            append("${group.name}: ${group.description}")
+            if (group.description.isNullOrBlank()) {
+                append(group.name)
+            } else {
+                append("${group.name}: ${group.description}")
+            }
         }
         append(text[1])
     }

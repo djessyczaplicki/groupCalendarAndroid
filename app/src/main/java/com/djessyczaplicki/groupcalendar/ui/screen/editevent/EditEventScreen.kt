@@ -99,7 +99,6 @@ fun EditEventScreen(
         FlowRow(
             modifier = Modifier
                 .wrapContentHeight()
-                .height(100.dp)
         ) {
             DatePickerPopup(
                 defaultText = if (isRecurrent) stringResource(R.string.pick_start_date)
@@ -176,7 +175,7 @@ fun EditEventScreen(
             FlowRow(
                 Modifier
                     .padding(4.dp)
-                    .height(100.dp)
+                    .wrapContentHeight()
             ) {
                 days.forEach { day ->
                     FilterChip(
@@ -279,9 +278,7 @@ fun EditEventScreen(
                             navController.popBackStack()
                         }
                     }
-
                 } else {
-
                     if (isEditing) {
                         val eventTemplate = Event(
                             name = name,

@@ -25,6 +25,7 @@ class TimetableViewModel @Inject constructor(
     val events = mutableStateOf(listOf<Event>())
     val groups = mutableStateOf(listOf<Group>())
     val shownGroups = mutableStateOf(listOf<Group>())
+    val adminGroups = mutableStateOf(listOf<Group>())
     val group = mutableStateOf(Group())
     val groupId = mutableStateOf("")
 
@@ -79,6 +80,7 @@ class TimetableViewModel @Inject constructor(
                 }
             }
             shownGroups.value = groups
+            updateAdminGroups()
             loadEvents()
         }
     }
@@ -94,5 +96,10 @@ class TimetableViewModel @Inject constructor(
         return shownGroups.value.find { group ->
             group.events.contains(event)
         }
+    }
+
+    private fun updateAdminGroups() {
+        val uid = Firebase.auth.uid
+        adminGroups.value = shownGroups.value.filter { group -> group.admins.contains(uid) }
     }
 }

@@ -26,7 +26,6 @@ import com.djessyczaplicki.groupcalendar.data.remote.model.Event
 import com.djessyczaplicki.groupcalendar.ui.item.BasicEvent
 import com.djessyczaplicki.groupcalendar.ui.item.DrawerContent
 import com.djessyczaplicki.groupcalendar.ui.item.GroupRow
-import com.djessyczaplicki.groupcalendar.ui.item.TopBar
 import com.djessyczaplicki.groupcalendar.ui.screen.AppScreens
 import com.djessyczaplicki.groupcalendar.ui.theme.GroupCalendarTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -89,7 +88,6 @@ fun TimetableScreen(
                         R.plurals.timetable_title,
                         shownGroups.size
                     ) + ": $groupNames",
-                    navController = navController,
                     isDailyViewEnabled = isDailyViewEnabled,
                     onIconClicked = {
                         isDailyViewEnabled = !isDailyViewEnabled
@@ -146,7 +144,13 @@ fun TimetableScreen(
                 }
             },
             floatingActionButton = {
-                TimetableFAB(navController = navController, timetableViewModel = timetableViewModel)
+                val adminGroups = timetableViewModel.adminGroups.value
+                if (adminGroups.isNotEmpty()) {
+                    TimetableFAB(
+                        navController = navController,
+                        timetableViewModel = timetableViewModel
+                    )
+                }
             }
         )
     }
@@ -314,6 +318,7 @@ fun TimetableFAB(
 ) {
     var isDialogShown by remember { mutableStateOf(false) }
     val shownGroups = timetableViewModel.shownGroups.value
+    val adminGroups = timetableViewModel.adminGroups.value
     FloatingActionButton(
         onClick = {
             if (shownGroups.size == 1) navController.navigate(
@@ -338,7 +343,7 @@ fun TimetableFAB(
             },
             buttons = {
                 LazyColumn {
-                    items(shownGroups) { group ->
+                    items(adminGroups) { group ->
                         GroupRow(
                             onDestinationClicked = {
                                 navController.navigate(

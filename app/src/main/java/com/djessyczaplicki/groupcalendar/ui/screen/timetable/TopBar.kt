@@ -1,4 +1,4 @@
-package com.djessyczaplicki.groupcalendar.ui.item
+package com.djessyczaplicki.groupcalendar.ui.screen.timetable
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -8,7 +8,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ViewDay
+import androidx.compose.material.icons.filled.ViewWeek
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,10 +25,10 @@ fun TopBar(
     title: String = "",
     color: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-    leftButtonIcon: ImageVector = Icons.Filled.ArrowBack,
-    rightButtonIcon: ImageVector? = null,
-    onLeftButtonClicked: () -> Unit,
-    onRightButtonClicked: (() -> Unit)? = null
+    buttonIcon: ImageVector = Icons.Filled.Menu,
+    isDailyViewEnabled: Boolean,
+    onIconClicked: () -> Unit,
+    onButtonClicked: () -> Unit
 ) {
     val context = LocalContext.current
     TopAppBar(
@@ -44,28 +46,22 @@ fun TopBar(
 
         },
         navigationIcon = {
-            IconButton(onClick = { onLeftButtonClicked() }) {
+            IconButton(onClick = { onButtonClicked() }) {
                 Icon(
-                    imageVector = leftButtonIcon,
-                    contentDescription = "Back button",
+                    imageVector = buttonIcon,
+                    contentDescription = "menu icon",
                     modifier = Modifier.size(30.dp),
                     tint = contentColor
                 )
             }
         },
         actions = {
-            if (rightButtonIcon != null) {
-                IconButton(onClick = {
-                    if (onRightButtonClicked != null) {
-                        onRightButtonClicked()
-                    }
-                }) {
-                    Icon(
-                        imageVector = rightButtonIcon,
-                        contentDescription = "Right Action",
-                        tint = contentColor
-                    )
-                }
+            IconButton(onClick = { onIconClicked() }) {
+                Icon(
+                    if (isDailyViewEnabled) Icons.Filled.ViewWeek else Icons.Filled.ViewDay,
+                    contentDescription = "DailyViewToggle",
+                    tint = contentColor
+                )
             }
         },
         backgroundColor = color
